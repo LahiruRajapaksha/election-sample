@@ -2,6 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import Login from './Login.tsx'
+import OfficerDashboard from './OfficerDashboard.tsx'
+import VoterDashboard from './VoterDashboard.tsx'
 import VoterRegistration from './VoterRegistration.tsx'
 import './index.css'
 
@@ -10,5 +12,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <App />
     <VoterRegistration/>
     <Login/>
-  </React.StrictMode>,
+    <VoterDashboard/>
+    <OfficerDashboard/>
+    </React.StrictMode>,
 )
