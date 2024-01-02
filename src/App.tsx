@@ -32,7 +32,7 @@ function App() {
             <Typography variant="h5" component="h6" style={{ color: 'black', fontSize: '1rem' }}>Login to make your vote. 
             </Typography>
             <Button variant="contained" size="small" sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}>
-              Log-in
+              Sign-in
             </Button>
           </section>
 
