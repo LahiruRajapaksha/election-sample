@@ -1,9 +1,7 @@
+import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import './App.css';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-
 
 function App() {
   const [count, setCount] = useState(0)
@@ -11,51 +9,44 @@ function App() {
   return (
     <>
       <div>
-
         <header>
-        <Typography variant="h1" gutterBottom>
-        h1. Heading
-      </Typography>
+        <Typography variant="h1" gutterBottom sx={{ fontSize: '2.5rem', fontWeight: "bolder" }}> 
+          Welcome to Gevs
+        </Typography>
+
         </header>
 
         <main>
           <section>
-            <h2>Voter Registration</h2>
-            <p>Register as a voter to participate in the election.</p>
-            <a href=''>Register Now</a>
+          <h2 style={{ fontWeight: 'bold' }}>Voter Registration</h2>
+            <Typography variant="h5" component="h6" style={{ color: 'black', fontSize: '1rem' }}>
+              Register as a voter to participate in the election.
+            </Typography>
+            <Button variant="contained" size="small" sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}>
+              Register
+            </Button>
           </section>
 
           <section>
-            <h2>VoterLogin</h2>
-            <p>Login to make your vote.</p>
-            <a href=''>Login Now</a>
+          <h2 style={{ fontWeight: 'bold' }}>VoterLogin</h2>
+            <Typography variant="h5" component="h6" style={{ color: 'black', fontSize: '1rem' }}>Login to make your vote. 
+            </Typography>
+            <Button variant="contained" size="small" sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}>
+              Log-in
+            </Button>
           </section>
 
           <section>
-            <h2>Election Commission Officer Login</h2>
-            <p>Login as an Election Commission Officer to manage the election.</p>
-            <a href=''></a>
+          <h2 style={{ fontWeight: 'bold' }}>Election Commission Officer Login</h2>
+            <Typography variant="h5" component="h6" style={{ color: 'black', fontSize: '1rem' }}>
+              Login as an Election Commission Officer to manage the election.  
+            </Typography>
+            <Button variant="contained" size="small" sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}>
+              Log-in
+            </Button>
           </section>
         </main>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
       </div>
-      <h1>Vite  React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
