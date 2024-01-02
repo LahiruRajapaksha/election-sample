@@ -21,7 +21,6 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    // Submit the form data
     console.log(voterDetails);
   };
 
