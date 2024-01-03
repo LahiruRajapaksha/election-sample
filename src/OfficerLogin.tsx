@@ -3,22 +3,37 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './OfficerLogin.css';
 
-interface LoginProps {
+
+interface OfficerLoginProps {
 }
 
-const Login: React.FC<LoginProps> = () => {
+const Login: React.FC<OfficerLoginProps> = () => {
   const [loginDetails, setLoginDetails] = useState({
+    email: '',
+    password: '',
+  });
+  const [errors, setErrors] = useState({
     email: '',
     password: '',
   });
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setLoginDetails({ ...loginDetails, [event.target.name]: event.target.value });
+    const { name, value } = event.target;
+    setLoginDetails({ ...loginDetails, [name]: value });
+
+    validateInput(name, value);
   };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    console.log(loginDetails);
+
+    const isValid = validateAllFields();
+
+    if (isValid) {
+      console.log('Submitted successfully', loginDetails);
+    } else {
+      console.log('Error');
+    }
   };
 
   const navigate = useNavigate();
@@ -27,10 +42,43 @@ const Login: React.FC<LoginProps> = () => {
     navigate(path);
   };
 
+  const validateInput = (name: string, value: string) => {
+    switch (name) {
+      case 'email':
+        if (!value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i)) {
+          setErrors({ ...errors, email: 'Invalid email address' });
+        } else {
+          setErrors({ ...errors, email: '' });
+        }
+        break;
+      case 'password':
+        if (value.length < 8) {
+          setErrors({
+            ...errors,
+            password: 'Password must be at least 8 characters',
+          });
+        } else {
+          setErrors({ ...errors, password: '' });
+        }
+        break;
+      default:
+        break;
+    }
+  };
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateAllFields = () => {
+    const isValid = Object.values(errors).every((error) => error === '');
+    return isValid;
+  };
+
   return (
-    <Container maxWidth="sm">
+    <Container className='login-container' maxWidth="sm">
       <Typography variant="h4" gutterBottom>
-       Officer Sign-in
+        Election Commission Officer Log-in
       </Typography>
       <form onSubmit={handleSubmit}>
         <TextField
@@ -42,6 +90,8 @@ const Login: React.FC<LoginProps> = () => {
           type="email"
           value={loginDetails.email}
           onChange={handleInputChange}
+          helperText={errors.email}
+          error={Boolean(errors.email)}
         />
         <TextField
           label="Password"
@@ -52,12 +102,16 @@ const Login: React.FC<LoginProps> = () => {
           type="password"
           value={loginDetails.password}
           onChange={handleInputChange}
+          helperText={errors.password}
+          error={Boolean(errors.password)}
         />
         <Button  
-        variant="contained" 
-         size="small" 
-        sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}
-        onClick={() => handleNavigation('/officer-dashboard')}>
+          variant="contained" 
+          type="submit" 
+          size="small" 
+          sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}
+          onClick={() => handleNavigation('/officer-dashboard')}
+        >
           Log In
         </Button>
       </form>
@@ -66,3 +120,4 @@ const Login: React.FC<LoginProps> = () => {
 };
 
 export default Login;
+

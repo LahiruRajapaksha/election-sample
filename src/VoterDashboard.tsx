@@ -27,7 +27,7 @@ const VoterDashboard: React.FC<VoterDashboardProps> = () => {
   };
 
   return (
-    <Container>
+    <Container className='dashboard-container'>
       <Typography variant="h4" gutterBottom>
         Voter Dashboard
       </Typography>
