@@ -1,7 +1,7 @@
 import { Button, Container, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Login.css';
+import './OfficerLogin.css';
 
 interface LoginProps {
 }
@@ -27,11 +27,10 @@ const Login: React.FC<LoginProps> = () => {
     navigate(path);
   };
 
-
   return (
     <Container maxWidth="sm">
       <Typography variant="h4" gutterBottom>
-       Sign-in
+       Officer Sign-in
       </Typography>
       <form onSubmit={handleSubmit}>
         <TextField
@@ -58,7 +57,7 @@ const Login: React.FC<LoginProps> = () => {
         variant="contained" 
          size="small" 
         sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}
-        onClick={() => handleNavigation('/voter-dashboard')}>
+        onClick={() => handleNavigation('/officer-dashboard')}>
           Log In
         </Button>
       </form>

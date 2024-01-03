@@ -47,8 +47,7 @@ const VoterDashboard: React.FC<VoterDashboardProps> = () => {
         ))}
       </RadioGroup>
 
-      <Button variant="contained" size="small" sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}
-      >
+      <Button variant="contained" size="small" sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }} >
         Submit Vote
       </Button>
     </Container>

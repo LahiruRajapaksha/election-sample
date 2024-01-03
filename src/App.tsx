@@ -1,10 +1,16 @@
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './App.css';
 
 function App() {
   const [count, setCount] = useState(0)
+  const navigate = useNavigate();
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
 
   return (
     <>
@@ -22,7 +28,11 @@ function App() {
             <Typography variant="h5" component="h6" style={{ color: 'black', fontSize: '1rem' }}>
               Register as a voter to participate in the election.
             </Typography>
-            <Button variant="contained" size="small" sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}>
+            <Button 
+                variant="contained" 
+                size="small" 
+                sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}
+                onClick={() => handleNavigation('/voter-registration')}>
               Register
             </Button>
           </section>
@@ -31,8 +41,12 @@ function App() {
           <h2 style={{ fontWeight: 'bold' }}>VoterLogin</h2>
             <Typography variant="h5" component="h6" style={{ color: 'black', fontSize: '1rem' }}>Login to make your vote. 
             </Typography>
-            <Button variant="contained" size="small" sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}>
-              Sign-in
+            <Button 
+                variant="contained" 
+                size="small" 
+                sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}
+                onClick={() => handleNavigation('/login')}>
+                Sign-in
             </Button>
           </section>
 
@@ -41,7 +55,11 @@ function App() {
             <Typography variant="h5" component="h6" style={{ color: 'black', fontSize: '1rem' }}>
               Login as an Election Commission Officer to manage the election.  
             </Typography>
-            <Button variant="contained" size="small" sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}>
+            <Button
+              variant="contained" 
+                size="small" 
+                sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}
+                onClick={() => handleNavigation('/officer-login')}>
               Log-in
             </Button>
           </section>
