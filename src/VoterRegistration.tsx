@@ -1,4 +1,4 @@
-import { Button, Container, FormControl, InputLabel, MenuItem, Select, TextField, Typography, } from '@mui/material';
+import { Button, Container, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import './VoterRegistration.css';
 
@@ -85,12 +85,12 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
     return isValid;
   };
 
-  const handleSelectChange = (event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
-    const { name, value } = event.target;
-    setVoterDetails({ ...voterDetails, [name as string]: value as string });
-    validateInput('constituency', value as string);
+  const handleSelectChange = (event: SelectChangeEvent<string>) => {
+    setVoterDetails({
+      ...voterDetails,
+      [event.target.name as string]: event.target.value,
+    });
   };
-
   return (
     <Container className="container" maxWidth="sm">
       <Typography variant="h4" gutterBottom>
@@ -151,6 +151,8 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
             name="constituency"
             value={voterDetails.constituency}
             label="Constituency"
+            onChange={handleSelectChange}
+            error={Boolean(errors.constituency)}
           >
             <MenuItem value="Constituency1">Shangri-la-Town</MenuItem>
             <MenuItem value="Constituency2">Northern-Kunlun-Mountain</MenuItem>
@@ -171,14 +173,24 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
           helperText={errors.uvc}
           error={Boolean(errors.uvc)}
         />
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+        <Button
+          variant="contained"
+          size="small"
+          sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' }}} 
+        >
+          Scan QR Code
+        </Button>
+
         <Button
           variant="contained"
           type="submit"
           size="small"
-          sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}
+          sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' }}}
         >
           Register
         </Button>
+        </div>
       </form>
     </Container>
     );
