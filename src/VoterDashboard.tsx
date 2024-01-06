@@ -17,6 +17,7 @@ const VoterDashboard: React.FC<VoterDashboardProps> = () => {
   ];
 
   const [selectedCandidate, setSelectedCandidate] = useState<string>('');
+  const [voteSubmitted, setVoteSubmitted] = useState<boolean>(false);
 
   const handleVoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedCandidate((event.target as HTMLInputElement).value);
@@ -24,7 +25,18 @@ const VoterDashboard: React.FC<VoterDashboardProps> = () => {
 
   const handleSubmitVote = () => {
     console.log('Voted for: ', selectedCandidate);
+    setVoteSubmitted(true);
   };
+
+  if (voteSubmitted) {
+    return (
+      <Container className='dashboard-container'>
+        <Typography variant="h5">
+          Thank you for voting!
+        </Typography>
+      </Container>
+    );
+  }
 
   return (
     <Container className='dashboard-container'>
@@ -43,11 +55,18 @@ const VoterDashboard: React.FC<VoterDashboardProps> = () => {
             value={candidate.id} 
             control={<Radio />} 
             label={candidate.name} 
+            disabled={voteSubmitted}
           />
         ))}
       </RadioGroup>
 
-      <Button variant="contained" size="small" sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }} >
+      <Button 
+        variant="contained" 
+        size="small" 
+        sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}
+        onClick={handleSubmitVote}
+        disabled={!selectedCandidate || voteSubmitted}
+      >
         Submit Vote
       </Button>
     </Container>
