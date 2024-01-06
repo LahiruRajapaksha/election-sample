@@ -1,5 +1,6 @@
 import { Button, Container, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
+import { QrReader } from 'react-qr-reader';
 import './VoterRegistration.css';
 
 interface VoterRegistrationProps {}
@@ -23,10 +24,33 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
     uvc: '',
   });
 
+  const [ showScanner, setShowScanner] = useState(false);
+  const [uvcScanned, setUvcScanned] = useState(false); 
+
+  const handleScan = (result: any, error: any) => {
+    if (result) {
+      setVoterDetails(prevDetails => ({ ...prevDetails, uvc: result.text }));
+      setShowScanner(false); 
+    }
+      if (!uvcScanned) {
+      setUvcScanned(true); 
+    }
+    if (error) {
+      console.error(error);
+    }
+  };
+
+  const toggleScanner = () => {
+    setShowScanner(!showScanner); 
+  };
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setVoterDetails({ ...voterDetails, [name]: value });
-
+    
+    if (name === 'uvc'&& uvcScanned) {
+      setUvcScanned(false); 
+    }
     validateInput(name, value);
   };
 
@@ -173,14 +197,28 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
           helperText={errors.uvc}
           error={Boolean(errors.uvc)}
         />
+
+        {showScanner && (
+        <QrReader
+          onResult={handleScan}
+          constraints={{ facingMode: 'user' }} 
+          containerStyle={{ 
+            width: '300px',   
+            height: '300px',  
+            margin: '0 auto'  
+          }} 
+        />
+        )}
+
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-        <Button
-          variant="contained"
-          size="small"
-          sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' }}} 
-        >
-          Scan QR Code
-        </Button>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={toggleScanner}
+            sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' }}}
+          >
+            Scan QR Code
+          </Button>
 
         <Button
           variant="contained"
