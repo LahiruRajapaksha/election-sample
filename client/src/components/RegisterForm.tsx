@@ -1,7 +1,7 @@
 import { Button, Container, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { QrReader } from 'react-qr-reader';
-import './VoterRegistration.css';
+import './RegisterForm.css';
 
 interface VoterRegistrationProps {}
 
@@ -31,8 +31,10 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
     if (result) {
       setVoterDetails(prevDetails => ({ ...prevDetails, uvc: result.text }));
       setShowScanner(false); 
+      window.location.reload()
     }
       if (!uvcScanned) {
+        console.log("Scanned: ");
       setUvcScanned(true); 
     }
     if (error) {
@@ -179,11 +181,11 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
             onChange={handleSelectChange}
             error={Boolean(errors.constituency)}
           >
-            <MenuItem value="Constituency1">Shangri-la-Town</MenuItem>
-            <MenuItem value="Constituency2">Northern-Kunlun-Mountain</MenuItem>
-            <MenuItem value="Constituency3">Western-Shangri-la</MenuItem>
-            <MenuItem value="Constituency4">Naboo-Vallery</MenuItem>
-            <MenuItem value="Constituency5">New-Felucia</MenuItem>
+            <MenuItem value="Shangri-la-Town">Shangri-la-Town</MenuItem>
+            <MenuItem value="Northern-Kunlun-Mountain">Northern-Kunlun-Mountain</MenuItem>
+            <MenuItem value="Western-Shangri-la">Western-Shangri-la</MenuItem>
+            <MenuItem value="Naboo-Vallery">Naboo-Vallery</MenuItem>
+            <MenuItem value="New-Felucia">New-Felucia</MenuItem>
           </Select>
           <div style={{ color: 'red' }}>{errors.constituency}</div>
         </FormControl>
@@ -198,7 +200,7 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
           helperText={errors.uvc}
           error={Boolean(errors.uvc)}
         />
-
+        
         {showScanner && (
         <QrReader
           onResult={handleScan}
@@ -225,7 +227,8 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
           variant="contained"
           type="submit"
           size="small"
-          sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' }}}
+          sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' }}}          
+          disabled={!validateAllFields()}
         >
           Register
         </Button>
