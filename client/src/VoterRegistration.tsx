@@ -116,6 +116,7 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
     });
   };
   return (
+    
     <Container className="container" maxWidth="sm">
       <Typography variant="h4" gutterBottom>
         Voter Registration

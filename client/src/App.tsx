@@ -15,13 +15,16 @@ function App() {
   return (
     <>
       <div>
-        <header>
+      <header>
         <Typography variant="h1" gutterBottom sx={{ fontSize: '2.5rem', fontWeight: "bolder" }}> 
-          Welcome to Gevs
+          GEVS
         </Typography>
-
-        </header>
-
+        <nav className="navbar">
+          <Button color="inherit" onClick={() => handleNavigation('/login')}>Login</Button>
+          <Button color="inherit" onClick={() => handleNavigation('/register')}>Register</Button>
+          <Button color="inherit" onClick={() => handleNavigation('/OfficerLogin')}>Election Officer Sign-In</Button>
+        </nav>
+      </header>
         <main>
           <section>
           <h2 style={{ fontWeight: 'bold' }}>Voter Registration</h2>
@@ -68,6 +71,5 @@ function App() {
     </>
   )
 }
-
 
 export default App
