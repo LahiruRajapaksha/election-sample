@@ -1,11 +1,13 @@
 import { Button, Container, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { QrReader } from 'react-qr-reader';
+import { useNavigate } from 'react-router-dom';
 import './RegisterForm.css';
 
 interface VoterRegistrationProps {}
 
 const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
+  const [isFieldsError, setIsFieldsError] = useState(false);
   const [voterDetails, setVoterDetails] = useState({
     email: '',
     fullName: '',
@@ -59,10 +61,10 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    const isValid = validateAllFields();
+    validateAllFields();
 
-    if (isValid) {
-      console.log(' Submitted successfully', voterDetails);
+    if (!isFieldsError) {
+      handleNavigation('/login');
     } else {
       console.log('Error');
     }
@@ -107,10 +109,15 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
   };
 
   const validateAllFields = () => {
-    const isValid = Object.values(errors).every((error) => error === '');
-    return isValid;
+    const isFieldError = Object.values(errors).every((error) => error === '');
+    const isFieldsEmpty = Object.values(voterDetails).every((value) => value !== '');
+    setIsFieldsError(isFieldError || isFieldsEmpty);
   };
 
+  const navigate = useNavigate();
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
   const handleSelectChange = (event: SelectChangeEvent<string>) => {
     setVoterDetails({
       ...voterDetails,
@@ -228,7 +235,8 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
           type="submit"
           size="small"
           sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' }}}          
-          disabled={!validateAllFields()}
+          //disabled={isFieldsError}
+          onClick={handleSubmit}
         >
           Register
         </Button>
