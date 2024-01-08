@@ -1,6 +1,6 @@
 import { Button, Container, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import { QrReader } from 'react-qr-reader';
+import QrReader from 'react-qr-reader';
 import { useNavigate } from 'react-router-dom';
 import './RegisterForm.css';
 
@@ -29,21 +29,16 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
   const [ showScanner, setShowScanner] = useState(false);
   const [uvcScanned, setUvcScanned] = useState(false); 
 
-  const handleScan = (result: any, error: any) => {
-    if (result) {
-      setVoterDetails(prevDetails => ({ ...prevDetails, uvc: result.text }));
+  const handleScan = (scanData: string | null) => {
+    if (scanData && scanData !== '') {
+      setVoterDetails(prevDetails => ({ ...prevDetails, uvc: scanData}));
       setShowScanner(false); 
-      window.location.reload()
-    }
-      if (!uvcScanned) {
-        console.log("Scanned: ");
-      setUvcScanned(true); 
-    }
-    if (error) {
-      console.error(error);
     }
   };
 
+  const scanError = (err: Error) => {
+    console.log(err);    
+  }
   const toggleScanner = () => {
     setShowScanner(!showScanner); 
   };
@@ -210,12 +205,12 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
         
         {showScanner && (
         <QrReader
-          onResult={handleScan}
-          constraints={{ facingMode: 'user' }} 
-          containerStyle={{ 
-            width: '300px',   
-            height: '300px',  
-            margin: '0 auto'  
+          onScan={handleScan}
+          facingMode='user' 
+          onError={scanError}
+          style={{
+            width: '300px',    
+            margin: '0 auto'
           }} 
         />
         )}
