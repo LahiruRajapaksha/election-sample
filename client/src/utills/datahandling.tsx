@@ -24,3 +24,37 @@ export const useRegisterUser = () => {
     });
     return {register}
 }
+
+const getUser = async (data: any) => {
+    try {
+        const response = await axiosClient.get(`/api/users/register`, data);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export const useGetUser = () => {
+    const { mutate: fetchUser } = useMutation({
+        mutationKey: ['getUser'],
+        mutationFn: getUser,
+    });
+    return { fetchUser};
+}
+
+const updateUser = async ( data: any ) => {
+    try {
+        const response = await axiosClient.put(`/api/users/register`, data);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export const useUpdateUser = () => {
+    const { mutate: updateUserMutation} = useMutation({
+        mutationKey: ['updateUser'],
+        mutationFn: updateUser,
+    });
+    return { updateUserMutation };
+}

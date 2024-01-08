@@ -18,7 +18,13 @@ app.post("/api/users/register", async (req, res) => {
     console.log("data retrieved",req.body);
 }
 )
+app.get("/api/users/register", async (req, res) => {
+     console.log("User not found", req.body);
+});
 
+app.put("/api/users/register", async (req, res) => {
+        console.log("Error updating user", req.body);
+});
 
 const PORT = 5000 || process.env.PORT;
 app.listen(PORT, () => {
