@@ -2,12 +2,14 @@ import { Button, Container, FormControl, InputLabel, MenuItem, Select, SelectCha
 import React, { useState } from 'react';
 import QrReader from 'react-qr-reader';
 import { useNavigate } from 'react-router-dom';
+import { useRegisterUser } from '../utills/datahandling';
 import './RegisterForm.css';
 
 interface VoterRegistrationProps {}
 
 const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
   const [isFieldsError, setIsFieldsError] = useState(false);
+  const {register}= useRegisterUser();
   const [voterDetails, setVoterDetails] = useState({
     email: '',
     fullName: '',
@@ -58,7 +60,8 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
 
     const isFieldsError = validateAllFields();
 
-    if (!isFieldsError) {
+    if (!isFieldsError) { 
+      register(voterDetails);
       handleNavigation('/login');
     } else {
       console.log('Error');// improve to error notification
