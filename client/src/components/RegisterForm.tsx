@@ -56,12 +56,12 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    validateAllFields();
+    const isFieldsError = validateAllFields();
 
     if (!isFieldsError) {
       handleNavigation('/login');
     } else {
-      console.log('Error');
+      console.log('Error');// improve to error notification
     }
   };
 
@@ -104,9 +104,9 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
   };
 
   const validateAllFields = () => {
-    const isFieldError = Object.values(errors).every((error) => error === '');
-    const isFieldsEmpty = Object.values(voterDetails).every((value) => value !== '');
-    setIsFieldsError(isFieldError || isFieldsEmpty);
+    const isFieldError = Object.values(errors).every((error) => error !== '');
+    const isFieldsEmpty = Object.values(voterDetails).every((value) => value === '');
+    return(isFieldError || isFieldsEmpty);
   };
 
   const navigate = useNavigate();
