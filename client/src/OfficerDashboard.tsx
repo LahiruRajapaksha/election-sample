@@ -1,11 +1,9 @@
-import { Button, Container, List, ListItem, ListItemText, Typography } from '@mui/material';
+import { Box, Button, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import './OfficerDashboard.css';
 
-
 interface ElectionCommissionDashboardProps {
 }
-
 interface ConstituencyResult {
   constituencyName: string;
   candidates: { name: string; votes: number }[];
@@ -28,11 +26,27 @@ const ElectionCommissionDashboard: React.FC<ElectionCommissionDashboardProps> = 
   }, [electionStarted]);
 
   return (
-    <Container>
-      <Typography variant="h4" gutterBottom>
+    <>
+    <Box sx={{ backgroundColor: '#333', display: "flex", justifyContent: "space-between", padding: "10px", alignItems: "center" }}>
+        <Typography variant="h1" gutterBottom sx={{ fontSize: '2.5rem', fontWeight: "bolder", color: 'white' }}>
+          GEVS
+        </Typography>
+        <Button sx={{ color: 'white' }} variant='contained'>
+          Logout
+        </Button>
+      </Box>
+        <Paper elevation={6} className="ec-dashboard">
+        <Typography component="h1" variant="h5">
         Election Commission Dashboard
-      </Typography>
-
+        </Typography>
+        <div className="ecf-info ">
+          <div className="profile-pic-placeholder">
+            {/* Image pic should go in here */}
+          </div>
+          <div className="ec-info-text">
+          <Typography>Election Commission</Typography>
+          </div>
+        </div>
       {electionStarted ? (
         <Button variant="contained" size="small" sx={{ backgroundColor: 'red', '&:hover': { backgroundColor: 'red' } }} onClick={endElection}>
           End Election
@@ -46,7 +60,7 @@ const ElectionCommissionDashboard: React.FC<ElectionCommissionDashboardProps> = 
       <Typography variant="h6" style={{ margin: '20px 0' }}>
         Election Results
       </Typography>
-
+    
       <List>
         {results.map((result, index) => (
           <ListItem key={index}>
@@ -57,14 +71,13 @@ const ElectionCommissionDashboard: React.FC<ElectionCommissionDashboardProps> = 
           </ListItem>
         ))}
       </List>
-
       {!electionStarted && (
         <Typography variant="h6">
           {isMajorityAchieved ? "Majority Achieved - Winner Declared" : "Hung Parliament"}
         </Typography>
       )}
-    </Container>
+      </Paper>
+    </>
   );
 };
-
 export default ElectionCommissionDashboard;

@@ -1,31 +1,89 @@
-.dashboard-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-  
-  .dashboard-heading {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .candidates-list {
-    width: 100%; 
-    max-width: 500px; 
-    margin-bottom: 30px;
-  }
-  
-  .candidate-item {
-    margin: 10px 0;
-    display: flex;
-    align-items: center;
-  }
-  
-  .submit-button {
-    display: block; 
-    margin: 20px auto; 
-    padding: 10px 20px;
-  }
-  
-  
+.voter-dashboard {
+  font-family: 'Arial', sans-serif;
+  background-color: #f0f0f0;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.voter-dashboard h1 {
+  color: #333;
+  margin-bottom: 20px;
+}
+.voter-info-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.voter-info {
+  background-color: #ffffff;
+  padding: 10px 20px;
+  margin-bottom: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.voter-info .voter-details {
+  color: #333; 
+  margin-left: 20px; 
+  font-weight: bold; 
+}
+.voter-info .profile-pic-placeholder {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid #333;
+  margin-right: 15px;
+  background-color: #eeeeee;
+}
+
+.party-section {
+  border-top: 1px solid #d3d3d3; 
+  padding-top: 20px; 
+}
+
+.party-name, .candidate-name {
+  margin: 10px 0;
+  padding: 5px;
+  border-bottom: 2px solid #333;
+  display: inline-block;
+  color: #333;
+  font-size: 1.2em;
+}
+
+
+.candidates-list {
+  list-style-type: none; 
+  padding-left: 0; 
+  margin: 0; 
+}
+
+.candidate-item {
+  padding: 5px 0; 
+}
+.candidate-radio {
+  margin-right: 10px; 
+}
+.Typography {
+  color: #333;
+  margin: 5px 0; 
+}
+.MuiRadio-root {
+  display: none;
+}
+
+.MuiFormControlLabel-label {
+  background-color: #ffffff;
+  padding: 5px 15px;
+  border: 2px solid #333;
+  border-radius: 20px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.Mui-checked + .MuiFormControlLabel-label {
+  background-color: #333;
+  color: white;
+}

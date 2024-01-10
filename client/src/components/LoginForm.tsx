@@ -57,8 +57,7 @@ useEffect(() => {
       if(!loginDetails.password) {
       setErrors((errors) => ({ ...errors, password: 'Password is required' }));
      } 
-      
-    
+   
     
   }
   const handleNavigation = (path: string) => {
