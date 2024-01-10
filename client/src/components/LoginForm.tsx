@@ -8,7 +8,7 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = () => {
-  const { login, isLoading, isError, isSuccess, data} = useLoginUser();
+  const { login,  isSuccess, data} = useLoginUser();
   const [loginDetails, setLoginDetails] = useState({
     email: '',
     password: '',
