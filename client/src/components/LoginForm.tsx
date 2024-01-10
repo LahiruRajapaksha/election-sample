@@ -1,12 +1,14 @@
 import { Button, Container, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLoginUser } from '../utills/datahandling';
 import './LoginForm.css';
 
 interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = () => {
+  const { login, isLoading, isError, isSuccess, data} = useLoginUser();
   const [loginDetails, setLoginDetails] = useState({
     email: '',
     password: '',
@@ -16,6 +18,14 @@ const Login: React.FC<LoginProps> = () => {
     password: '',
   });
 
+
+useEffect(() => {
+  if (data === 'User logged in successfully' && isSuccess) 
+  {
+    handleNavigation('/voter-dashboard');
+  }
+   if(data === 'Invalid credentials')  (setErrors({ password: 'Invalid password', email: 'Invalid email address' }));
+},[data])
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setLoginDetails({ ...loginDetails, [name]: value });
@@ -37,6 +47,20 @@ const Login: React.FC<LoginProps> = () => {
 
   const navigate = useNavigate();
 
+  const handleLogin = () => {
+    if (loginDetails.email && loginDetails.password) {
+      login(loginDetails);
+     } 
+      if(!loginDetails.email ) {
+      setErrors((errors) => ({ ...errors, email: 'Email is required' }));
+     }
+      if(!loginDetails.password) {
+      setErrors((errors) => ({ ...errors, password: 'Password is required' }));
+     } 
+      
+    
+    
+  }
   const handleNavigation = (path: string) => {
     navigate(path);
   };
@@ -109,7 +133,7 @@ const Login: React.FC<LoginProps> = () => {
           type="submit" 
           size="small" 
           sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}
-          onClick={() => handleNavigation('/voter-dashboard')}
+          onClick={handleLogin}
         >
           Sign-in
         </Button>

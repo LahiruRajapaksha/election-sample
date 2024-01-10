@@ -1,5 +1,5 @@
 import { Button, Container, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import QrReader from 'react-qr-reader';
 import { useNavigate } from 'react-router-dom';
 import { useRegisterUser } from '../utills/datahandling';
@@ -9,7 +9,7 @@ interface VoterRegistrationProps {}
 
 const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
   const [isFieldsError, setIsFieldsError] = useState(false);
-  const {register}= useRegisterUser();
+  const {register, error, isSuccess, data}= useRegisterUser();
   const [voterDetails, setVoterDetails] = useState({
     email: '',
     fullName: '',
@@ -30,6 +30,16 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
 
   const [ showScanner, setShowScanner] = useState(false);
   const [uvcScanned, setUvcScanned] = useState(false); 
+
+  useEffect(() => {
+    if (data==='User already exists') {
+      setErrors({ ...errors, email: 'User already exists' });
+      return;
+    }  
+    if (data === "User registered successfully") 
+    handleNavigation('/login');
+    //setErrors({ ...errors, email: 'User already exists' });
+  },[data])
 
   const handleScan = (scanData: string | null) => {
     if (scanData && scanData !== '') {
@@ -62,7 +72,6 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
 
     if (!isFieldsError) { 
       register(voterDetails);
-      handleNavigation('/login');
     } else {
       console.log('Error');// improve to error notification
     }
