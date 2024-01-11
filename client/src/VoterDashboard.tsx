@@ -1,4 +1,4 @@
-import { Box, Button, FormControlLabel, Paper, Radio, RadioGroup, Typography } from '@mui/material';
+import { Box, Button, MenuItem, Paper, Select, SelectChangeEvent, Typography } from '@mui/material';
 import { useState } from 'react';
 import './VoterDashboard.css';
 
@@ -40,19 +40,33 @@ const VoterDashboard = () => {
         { name: 'Candidate C3', id: 'c3' },
         { name: 'Candidate C4', id: 'c4' }
       ]
+    },
+    {
+      name: 'Independent ',
+      candidates: [
+        { name: 'Candidate I1', id: 'i1' },
+        { name: 'Candidate I2', id: 'i2' },
+        { name: 'Candidate I3', id: 'i3' },
+        { name: 'Candidate I4', id: 'i4' },
+      ]
     }
   ];
   const [selectedParty, setSelectedParty] = useState<string | null>(null);
   const [selectedCandidate, setSelectedCandidate] = useState<string>('');
-  const [voteSubmitted, setVoteSubmitted] = useState<boolean>(false); //note voting submission 
+  const [voteSubmitted, setVoteSubmitted] = useState<boolean>(false);
+  const [dropdownOpen, setDropdownOpen] = useState<{ [key: string]: boolean }>({});
 
-  const handlePartyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedParty(event.target.value);
+  const handleViewCandidatesClick = (partyName: string) => {
+    setDropdownOpen(prevState => ({
+      ...prevState,
+      [partyName]: !prevState[partyName]
+    }));
+    setSelectedParty(partyName);
     setSelectedCandidate('');
   };
 
-  const handleCandidateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedCandidate(event.target.value);
+  const handleCandidateChange = (event: SelectChangeEvent<string>) => {
+    setSelectedCandidate(event.target.value as string);
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -85,25 +99,37 @@ const VoterDashboard = () => {
           </div>
         </div>
         <form onSubmit={handleSubmit}>
-          {parties.map((party, /*index*/) => (
-             <Box key={party.name} sx={{ marginBottom: '10px' }}>
-              <Typography variant="h6">{party.name}</Typography>
-              <RadioGroup
-                name="candidate-selection"
+        {parties.map((party) => (
+          <Box key={party.name} sx={{ marginBottom: '20px' }}>
+            <Typography variant="h6">
+              {party.name}
+            </Typography>
+            <Button 
+              onClick={() => handleViewCandidatesClick(party.name)} 
+              variant="contained" 
+              sx={{ marginTop: '10px', display: 'block' , backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}
+            >
+              View Candidates
+            </Button>
+            {dropdownOpen[party.name] && (
+              <Select
                 value={selectedCandidate}
                 onChange={handleCandidateChange}
+                displayEmpty
+                inputProps={{ 'aria-label': 'Without label' }}
+                sx={{ marginTop: '10px' }}
+                
               >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
                 {party.candidates.map((candidate) => (
-                  <FormControlLabel
-                    key={candidate.id}
-                    value={candidate.id}
-                    control={<Radio />}
-                    label={candidate.name}
-                  />
+                  <MenuItem key={candidate.id} value={candidate.id}>{candidate.name}</MenuItem>
                 ))}
-              </RadioGroup>
-            </Box>
-          ))}
+              </Select>
+            )}
+          </Box>
+        ))}
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Button 
             type="submit" 
