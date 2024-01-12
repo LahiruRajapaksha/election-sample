@@ -163,7 +163,8 @@ const dataset = [
                 />
               </Card>
             </Box>
-            <Box sx={{ pt: 5, px: 2, alignItems: "center" }}>
+            <Box>
+              <Typography variant='h6'>Detailed Stats</Typography>
               <TableVote />
             </Box>
           </Box>
