@@ -3,7 +3,7 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import { PieChart } from "@mui/x-charts/PieChart";
 import React, { useState } from "react";
 import "./OfficerDashboard.css";
-import TableVote from "../components/TableVote";
+import TableVote from "../../components/TableVote";
 
 interface ElectionCommissionDashboardProps {}
 

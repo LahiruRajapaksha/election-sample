@@ -1,11 +1,11 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import OfficerDashboard from "./utills/OfficerDashboard.tsx";
-import OfficerLogin from './OfficerLogin.tsx';
-import VoterDashboard from './VoterDashboard.tsx';
-import Login from './components/LoginForm.tsx';
-import VoterRegistration from './components/RegisterForm.tsx';
-import LandingPage from './views/LandingPage.tsx';
+import OfficerDashboard from "./views/OfficerDashBoard/OfficerDashboard.tsx";
+import OfficerLogin from "./OfficerLogin.tsx";
+import VoterDashboard from "./VoterDashboard.tsx";
+import Login from "./components/LoginForm.tsx";
+import VoterRegistration from "./components/RegisterForm.tsx";
+import LandingPage from "./views/LandingPage/LandingPage.tsx";
 
 function App() {
  
