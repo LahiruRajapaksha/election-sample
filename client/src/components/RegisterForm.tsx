@@ -1,113 +1,145 @@
-import { Button, Container, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import QrReader from 'react-qr-reader';
-import { useNavigate } from 'react-router-dom';
-import { useRegisterUser } from '../utills/datahandling';
-import './RegisterForm.css';
+import {
+  Box,
+  Button,
+  Card,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Typography,
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import Snackbar from "@mui/material/Snackbar";
+import QrReader from "react-qr-reader";
+import { useNavigate } from "react-router-dom";
+import { useRegisterUser } from "../utills/datahandling";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
+import "./RegisterForm.css";
 
-interface VoterRegistrationProps {}
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref
+) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
   const [isFieldsError, setIsFieldsError] = useState(false);
-  const {register, error, isSuccess, data}= useRegisterUser();
+  const { register, error, isSuccess, data } = useRegisterUser();
   const [voterDetails, setVoterDetails] = useState({
-    email: '',
-    fullName: '',
-    dateOfBirth: '',
-    password: '',
-    constituency: '',
-    uvc: '',
+    email: "",
+    fullName: "",
+    dateOfBirth: "",
+    password: "",
+    constituency: "",
+    uvc: "",
   });
 
   const [errors, setErrors] = useState({
-    email: '',
-    fullName: '',
-    dateOfBirth: '',
-    password: '',
-    constituency: '',
-    uvc: '',
+    email: "",
+    fullName: "",
+    dateOfBirth: "",
+    password: "",
+    constituency: "",
+    uvc: "",
   });
 
-  const [ showScanner, setShowScanner] = useState(false);
-  const [uvcScanned, setUvcScanned] = useState(false); 
+  const [showScanner, setShowScanner] = useState(false);
+  const [uvcScanned, setUvcScanned] = useState(false);
 
   useEffect(() => {
-    if (data==='User already exists') {
-      setErrors({ ...errors, email: 'User already exists' });
+    if (data === "User already exists") {
+      setErrors({ ...errors, email: "User already exists" });
       return;
-    }  
-    if (data === "User registered successfully") 
-    handleNavigation('/login');
+    }
+    if (data === "User registered successfully") handleNavigation("/login");
     //setErrors({ ...errors, email: 'User already exists' });
-  },[data])
+  }, [data]);
+  const [open, setOpen] = React.useState(false);
+
+  const handleClick = () => {};
+
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   const handleScan = (scanData: string | null) => {
-    if (scanData && scanData !== '') {
-      setVoterDetails(prevDetails => ({ ...prevDetails, uvc: scanData}));
-      setShowScanner(false); 
+    if (scanData && scanData !== "") {
+      setVoterDetails((prevDetails) => ({ ...prevDetails, uvc: scanData }));
+      setShowScanner(false);
     }
   };
 
   const scanError = (err: Error) => {
-    console.log(err);    
-  }
+    console.log(err);
+  };
   const toggleScanner = () => {
-    setShowScanner(!showScanner); 
+    setShowScanner(!showScanner);
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setVoterDetails({ ...voterDetails, [name]: value });
-    
-    if (name === 'uvc'&& uvcScanned) {
-      setUvcScanned(false); 
+
+    if (name === "uvc" && uvcScanned) {
+      setUvcScanned(false);
     }
     validateInput(name, value);
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-
+  const handleSubmit = () => {
     const isFieldsError = validateAllFields();
-
-    if (!isFieldsError) { 
-      register(voterDetails);
+    // console.log("IS FIELD ERROR", isFieldsError);
+    if (!isFieldsError) {
+      register({ ...voterDetails, isVoted: false });
     } else {
-      console.log('Error');// improve to error notification
+      setOpen(true); // improve to error notification
     }
   };
 
   const validateInput = (name: string, value: string) => {
     switch (name) {
-      case 'email':
+      case "email":
         if (!value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i)) {
-          setErrors({ ...errors, email: 'Invalid email address' });
+          setErrors({ ...errors, email: "Invalid email address" });
         } else {
-          setErrors({ ...errors, email: '' });
+          setErrors({ ...errors, email: "" });
         }
         break;
-      case 'fullName':
-        if (value.trim() === '') {
-          setErrors({ ...errors, fullName: 'Full name is required' });
+      case "fullName":
+        if (value.trim() === "") {
+          setErrors({ ...errors, fullName: "Full name is required" });
         } else {
-          setErrors({ ...errors, fullName: '' });
+          setErrors({ ...errors, fullName: "" });
         }
         break;
-      case 'dateOfBirth':
-        if (!value.match(/^\d{4}-\d{2}-\d{2}$/)) {
-          setErrors({ ...errors, dateOfBirth: 'Invalid date format' });
+      case "dateOfBirth":
+        if (
+          new Date().getTime() - new Date(value).getTime() <
+          18 * 365 * 24 * 60 * 60 * 1000
+        ) {
+          setErrors({ ...errors, dateOfBirth: "Age should be 18 years" });
         } else {
-          setErrors({ ...errors, dateOfBirth: '' });
+          setErrors({ ...errors, dateOfBirth: "" });
         }
         break;
-      case 'password':
+      case "password":
         if (value.length < 8) {
           setErrors({
             ...errors,
-            password: 'Password must be at least 8 characters',
+            password: "Password must be at least 8 characters",
           });
         } else {
-          setErrors({ ...errors, password: '' });
+          setErrors({ ...errors, password: "" });
         }
         break;
       default:
@@ -116,9 +148,13 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
   };
 
   const validateAllFields = () => {
-    const isFieldError = Object.values(errors).every((error) => error !== '');
-    const isFieldsEmpty = Object.values(voterDetails).every((value) => value === '');
-    return(isFieldError || isFieldsEmpty);
+    const isFieldError = Object.values(errors).every((error) => error !== "");
+    const isFieldsEmpty = Object.values(voterDetails).every(
+      (value) => value === ""
+    );
+    console.log("IS FIELD ERROR", isFieldError);
+    console.log("IS FIELD EMPTY", isFieldsEmpty);
+    return isFieldError || isFieldsEmpty;
   };
 
   const navigate = useNavigate();
@@ -132,12 +168,11 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
     });
   };
   return (
-    
-    <Container className="container" maxWidth="sm">
-      <Typography variant="h4" gutterBottom>
-        Voter Registration
-      </Typography>
-      <form onSubmit={handleSubmit}>
+    <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
+      <Card sx={{ maxWidth: "50%", p: 3 }}>
+        <Typography variant="h4" sx={{ textAlign: "center" }}>
+          Voter Registration
+        </Typography>
         <TextField
           label="Voter ID (Email Address)"
           variant="outlined"
@@ -147,8 +182,8 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
           type="email"
           value={voterDetails.email}
           onChange={handleInputChange}
-          helperText={errors.email} 
-          error={Boolean(errors.email)} 
+          helperText={errors.email}
+          error={Boolean(errors.email)}
         />
         <TextField
           label="Full Name"
@@ -196,12 +231,14 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
             error={Boolean(errors.constituency)}
           >
             <MenuItem value="Shangri-la-Town">Shangri-la-Town</MenuItem>
-            <MenuItem value="Northern-Kunlun-Mountain">Northern-Kunlun-Mountain</MenuItem>
+            <MenuItem value="Northern-Kunlun-Mountain">
+              Northern-Kunlun-Mountain
+            </MenuItem>
             <MenuItem value="Western-Shangri-la">Western-Shangri-la</MenuItem>
             <MenuItem value="Naboo-Vallery">Naboo-Vallery</MenuItem>
             <MenuItem value="New-Felucia">New-Felucia</MenuItem>
           </Select>
-          <div style={{ color: 'red' }}>{errors.constituency}</div>
+          <div style={{ color: "red" }}>{errors.constituency}</div>
         </FormControl>
         <TextField
           label="8-digit Unique Voter Code (UVC)"
@@ -214,44 +251,64 @@ const VoterRegistration: React.FC<VoterRegistrationProps> = () => {
           helperText={errors.uvc}
           error={Boolean(errors.uvc)}
         />
-        
+
         {showScanner && (
-        <QrReader
-          onScan={handleScan}
-          facingMode='user' 
-          onError={scanError}
-          style={{
-            width: '300px',    
-            margin: '0 auto'
-          }} 
-        />
+          <QrReader
+            onScan={handleScan}
+            facingMode="user"
+            onError={scanError}
+            style={{
+              width: "300px",
+              margin: "0 auto",
+            }}
+          />
         )}
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: "20px",
+          }}
+        >
           <Button
             variant="contained"
             size="small"
             onClick={toggleScanner}
-            sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' }}}
+            sx={{
+              backgroundColor: "#333",
+              "&:hover": { backgroundColor: "#333" },
+            }}
           >
             Scan QR Code
           </Button>
 
-        <Button
-          variant="contained"
-          type="submit"
-          size="small"
-          sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' }}}          
-          //disabled={isFieldsError}
-          onClick={handleSubmit}
-        >
-          Register
-        </Button>
+          <Button
+            variant="contained"
+            type="submit"
+            size="small"
+            sx={{
+              backgroundColor: "#333",
+              "&:hover": { backgroundColor: "#333" },
+            }}
+            onClick={handleSubmit}
+          >
+            Register
+          </Button>
         </div>
-      </form>
-    </Container>
-    );
-
+      </Card>
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
+          Please fill the fileds
+        </Alert>
+      </Snackbar>
+    </Box>
+  );
 };
 
 export default VoterRegistration;

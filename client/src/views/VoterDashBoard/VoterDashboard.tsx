@@ -1,68 +1,44 @@
-import { Box, Button, MenuItem, Paper, Select, SelectChangeEvent, Typography } from '@mui/material';
-import { useState } from 'react';
-import './VoterDashboard.css';
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Typography,
+} from "@mui/material";
+import { useState } from "react";
+import "./VoterDashboard.css";
+import { useGetCandidateList } from "../../utills/datahandling";
 
-type Candidate = {
+export type Candidate = {
   name: string;
-  id: string;
+  party: string;
 };
 
-type Party = {
+export type Party = {
   name: string;
   candidates: Candidate[];
 };
 
+export type CandidateList = {
+  candidates: Candidate[];
+  parties: string[];
+};
+
 const VoterDashboard = () => {
-  const parties: Party[] = [
-    {
-      name: 'Blue Party',
-      candidates: [
-        { name: 'Candidate A1', id: 'a1' },
-        { name: 'Candidate A2', id: 'a2' },
-        { name: 'Candidate A3', id: 'a3' },
-        { name: 'Candidate A4', id: 'a4' }
-      ]
-    },
-    {
-      name: 'Red Party',
-      candidates: [
-        { name: 'Candidate B1', id: 'b1' },
-        { name: 'Candidate B2', id: 'b2' },
-        { name: 'Candidate B3', id: 'b3' },
-        { name: 'Candidate B4', id: 'b4' }
-      ]
-    },
-    {
-      name: 'Yellow Party',
-      candidates: [
-        { name: 'Candidate C1', id: 'c1' },
-        { name: 'Candidate C2', id: 'c2' },
-        { name: 'Candidate C3', id: 'c3' },
-        { name: 'Candidate C4', id: 'c4' }
-      ]
-    },
-    {
-      name: 'Independent ',
-      candidates: [
-        { name: 'Candidate I1', id: 'i1' },
-        { name: 'Candidate I2', id: 'i2' },
-        { name: 'Candidate I3', id: 'i3' },
-        { name: 'Candidate I4', id: 'i4' },
-      ]
-    }
-  ];
-  const [selectedParty, setSelectedParty] = useState<string | null>(null);
-  const [selectedCandidate, setSelectedCandidate] = useState<string>('');
+  const { data, refetch, isLoading } = useGetCandidateList("Shangri-la-Town");
+  const { candidates = [], parties = [] } = data || {};
+
+  const [selectedParty, setSelectedParty] = useState<string>("");
+  const [selectedCandidate, setSelectedCandidate] = useState<string>("");
   const [voteSubmitted, setVoteSubmitted] = useState<boolean>(false);
-  const [dropdownOpen, setDropdownOpen] = useState<{ [key: string]: boolean }>({});
 
   const handleViewCandidatesClick = (partyName: string) => {
-    setDropdownOpen(prevState => ({
-      ...prevState,
-      [partyName]: !prevState[partyName]
-    }));
+    // setDropdownOpen((prevState) => !prevState);
     setSelectedParty(partyName);
-    setSelectedCandidate('');
+    setSelectedCandidate("");
   };
 
   const handleCandidateChange = (event: SelectChangeEvent<string>) => {
@@ -71,77 +47,115 @@ const VoterDashboard = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(`You have voted for party: ${selectedParty} and candidate: ${selectedCandidate}`);
+    console.log(
+      `You have voted for party: ${selectedParty} and candidate: ${selectedCandidate}`
+    );
     setVoteSubmitted(true);
   };
 
   return (
-    <>
-    <Box sx={{ backgroundColor: '#333', display: "flex", justifyContent: "space-between", padding: "10px", alignItems: "center" }}>
-        <Typography variant="h1" gutterBottom sx={{ fontSize: '2.5rem', fontWeight: "bolder", color: 'white' }}>
-          GEVS
+    <Box>
+      <Box
+        sx={{
+          backgroundColor: "#333",
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "10px",
+          alignItems: "center",
+        }}
+      >
+        <Typography
+          variant="h1"
+          gutterBottom
+          sx={{ fontSize: "2.5rem", fontWeight: "bolder", color: "white" }}
+        >
+          GEVS - Voter Dashboard
         </Typography>
-        <Button sx={{ color: 'white' }} variant='contained'>
+        <Button sx={{ color: "white" }} variant="contained">
           Logout
         </Button>
       </Box>
-      <Paper elevation={6} className="voter-dashboard">
-        <Typography component="h1" variant="h5">
-          Voter's Dashboard
-        </Typography>
-        <div className="voter-info">
-          <div className="profile-pic-placeholder">
-            {/* Image pic should go in here */}
-          </div>
-          <div className="voter-info-text">
-          <Typography>Voter's Name</Typography>
-          <Typography>Constituency</Typography>
-          </div>
-        </div>
-        <form onSubmit={handleSubmit}>
-        {parties.map((party) => (
-          <Box key={party.name} sx={{ marginBottom: '20px' }}>
-            <Typography variant="h6">
-              {party.name}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-around",
+          mt: 3,
+          mx: 2,
+          gap: 1,
+        }}
+      >
+        <Card sx={{ flexGrow: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <Avatar
+              alt="Remy Sharp"
+              src="/static/images/avatar/1.jpg"
+              sx={{ width: 120, height: 120 }}
+            />
+            <Typography variant="h5" sx={{ textAlign: "center", p: 3 }}>
+              Details
             </Typography>
-            <Button 
-              onClick={() => handleViewCandidatesClick(party.name)} 
-              variant="contained" 
-              sx={{ marginTop: '10px', display: 'block' , backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}
-            >
-              View Candidates
-            </Button>
-            {dropdownOpen[party.name] && (
+          </Box>
+        </Card>
+        <Card sx={{ flexGrow: 2 }}>
+          <Box sx={{ p: 3 }}>
+            <Typography variant="h5" sx={{ textAlign: "center" }}>
+              Cast Your Vote
+            </Typography>
+            <form onSubmit={handleSubmit}>
+              <Typography variant="h6">Select Party</Typography>
               <Select
-                value={selectedCandidate}
-                onChange={handleCandidateChange}
-                displayEmpty
-                inputProps={{ 'aria-label': 'Without label' }}
-                sx={{ marginTop: '10px' }}
-                
+                sx={{ width: "100%" }}
+                value={selectedParty}
+                onChange={(event) =>
+                  handleViewCandidatesClick(event.target.value)
+                }
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                {party.candidates.map((candidate) => (
-                  <MenuItem key={candidate.id} value={candidate.id}>{candidate.name}</MenuItem>
+                {parties.map((party: string, index: number) => (
+                  <MenuItem key={`${index}-${party}`} value={party}>
+                    {party}
+                  </MenuItem>
                 ))}
               </Select>
-            )}
+              {selectedParty && (
+                <Box>
+                  <Typography variant="h6">Select Candidate</Typography>
+                  <Select
+                    sx={{ width: "100%" }}
+                    value={selectedCandidate}
+                    onChange={handleCandidateChange}
+                  >
+                    {candidates
+                      .filter((candidate) => candidate.party === selectedParty)
+                      .map((candidate: Candidate, index: number) => (
+                        <MenuItem
+                          key={`${index}-${candidate.name}`}
+                          value={candidate.name}
+                        >
+                          {candidate.name}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </Box>
+              )}
+              <Button
+                sx={{ marginTop: "10px" }}
+                variant="contained"
+                type="submit"
+                disabled={!selectedCandidate || !selectedParty}
+              >
+                Submit
+              </Button>
+            </form>
           </Box>
-        ))}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button 
-            type="submit" 
-            variant="contained" 
-            sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}
-          >
-            Submit Vote
-          </Button>
-        </Box>
-        </form>
-      </Paper>
-    </>
+        </Card>
+      </Box>
+    </Box>
   );
 };
 
