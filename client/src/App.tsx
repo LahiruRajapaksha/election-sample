@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import OfficerDashboard from './OfficerDashboard.tsx';
+import OfficerDashboard from "./utills/OfficerDashboard.tsx";
 import OfficerLogin from './OfficerLogin.tsx';
 import VoterDashboard from './VoterDashboard.tsx';
 import Login from './components/LoginForm.tsx';

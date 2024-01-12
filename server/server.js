@@ -52,8 +52,39 @@ app.post("/api/user/login", async (req, res) => {
     }
 });
 
-app.put("/api/users/register", async (req, res) => {
-        console.log("Error updating user", req.body);
+app.post("/api/uvc", async (req, res) => {
+    const { uvc, isUsed } = req.body;
+    try {
+        const results = await db.collection("uvc").doc(uvc).set({ isUsed: isUsed });
+        res.status(201).send("Uvc added successfully");
+    }
+    catch (error) {
+        res.status(400).send(error.message);
+    }
+});
+
+app.post("/api/constituency/addCandidate", async (req, res) => {
+    const { data, constituency } = req.body;
+    try {
+        const results = await db.collection("constituency").doc(constituency).set({ ...data });
+        res.status(201).send("Candidate added successfully");
+    }
+    catch (error) {
+        res.status(400).send(error.message);
+    }
+});
+
+app.get("/api/constituency/:constituencyName", async (req, res) => {
+    const { constituencyName } = req.params;
+    try {
+        const userRef = await db.collection("constituency").doc(constituencyName);
+        const doc = await userRef.get();
+        const results = doc.data();
+        res.status(200).send(results);
+    }
+    catch (error) {
+        res.status(400).send(error.message);
+    }
 });
 
 const PORT = 5000 || process.env.PORT;
