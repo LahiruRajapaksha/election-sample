@@ -28,7 +28,12 @@ export type RegisterUserData = {
   isVoted?: boolean;
 };
 
-const VoterRegistration = () => {
+type RegisterFormProps = {
+  handleRegistrationSuccess: () => void;
+};
+
+const VoterRegistration = (props: RegisterFormProps) => {
+  const { handleRegistrationSuccess } = props;
   const { register, error, isPending, data } = useRegisterUser();
   const [snackBarData, setSnackBarData] = useState({
     message: "",
@@ -57,38 +62,46 @@ const VoterRegistration = () => {
   });
 
   useEffect(() => {
-    if (data === "User already exists") {
-      setErrors((errors) => ({
-        ...errors,
-        email: "User is already registed with this email",
-      }));
-      setSnackBarData((data) => ({
-        ...data,
-        message: "User is already registed with this email",
-        severity: "error",
-      }));
-      setSnackBarOpen((prev) => !prev);
-      return;
+    switch (data) {
+      case "UVC already used":
+        setErrors((errors) => ({
+          ...errors,
+          uvc: "UVC already used",
+        }));
+        setSnackBarData((data) => ({
+          ...data,
+          message: "UVC already used",
+          severity: "error",
+        }));
+        setSnackBarOpen((prev) => !prev);
+        break;
+      case "User already exists":
+        setErrors((errors) => ({
+          ...errors,
+          email: "User is already registed with this email",
+        }));
+        setSnackBarData((data) => ({
+          ...data,
+          message: "User is already registed with this email",
+          severity: "error",
+        }));
+        setSnackBarOpen((prev) => !prev);
+        break;
+      case "User registered successfully":
+        handleRegistrationSuccess();
+        break;
+      default:
+        if (error) {
+          setSnackBarData((data) => ({
+            ...data,
+            message: "Something went wrong",
+            severity: "error",
+          }));
+          setSnackBarOpen((prev) => !prev);
+        }
+        break;
     }
-    if (data === "User registered successfully" && !isPending) {
-      setSnackBarData((data) => ({
-        ...data,
-        message: "User registered successfully",
-        severity: "success",
-      }));
-      setSnackBarOpen((prev) => !prev);
-      navigate("/login");
-    }
-    if (error) {
-      setSnackBarData((data) => ({
-        ...data,
-        message: "Something went wrong",
-        severity: "error",
-      }));
-      setSnackBarOpen((prev) => !prev);
-    }
-    //setErrors({ ...errors, email: 'User already exists' });
-  }, [data, navigate, isPending, error]);
+  }, [data, navigate, isPending, error, handleRegistrationSuccess]);
 
   const handleClose = (
     event?: React.SyntheticEvent | Event,
@@ -117,7 +130,7 @@ const VoterRegistration = () => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setVoterDetails({ ...voterDetails, [name]: value });
-
+    setErrors({ ...errors, [name]: "" });
     if (name === "uvc" && uvcScanned) {
       setUvcScanned(false);
     }
@@ -213,6 +226,7 @@ const VoterRegistration = () => {
             onChange={handleInputChange}
             helperText={errors.email}
             error={Boolean(errors.email)}
+            disabled={isPending}
           />
           <TextField
             label="Full Name"
@@ -224,6 +238,7 @@ const VoterRegistration = () => {
             onChange={handleInputChange}
             helperText={errors.fullName}
             error={Boolean(errors.fullName)}
+            disabled={isPending}
           />
           <TextField
             label="Date of Birth"
@@ -237,6 +252,7 @@ const VoterRegistration = () => {
             onChange={handleInputChange}
             helperText={errors.dateOfBirth}
             error={Boolean(errors.dateOfBirth)}
+            disabled={isPending}
           />
           <TextField
             label="Password"
@@ -249,6 +265,7 @@ const VoterRegistration = () => {
             onChange={handleInputChange}
             helperText={errors.password}
             error={Boolean(errors.password)}
+            disabled={isPending}
           />
           <FormControl fullWidth margin="normal">
             <InputLabel>Constituency</InputLabel>
@@ -279,6 +296,7 @@ const VoterRegistration = () => {
             onChange={handleInputChange}
             helperText={errors.uvc}
             error={Boolean(errors.uvc)}
+            disabled={isPending}
           />
 
           {showScanner && (

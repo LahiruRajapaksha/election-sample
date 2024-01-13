@@ -4,21 +4,40 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginForm from "../../components/LoginForm/LoginForm";
 import RegisterForm from "../../components/RegistrationForm/RegisterForm";
+import SnackBar from "../../components/SnackBar/SnackBar";
 //import './LandingPage.css';
 
 function LandingPage() {
-  const [isLoginFormVisible, setLoginFormVisible] = useState(false);
   const navigate = useNavigate();
+  const [isLoginFormVisible, setLoginFormVisible] = useState(false);
+  const [isSnackbarOpen, setSnackBarOpen] = useState(false);
+  const [snackBarData, setSnackBarData] = useState({
+    message: "",
+    severity: "",
+  });
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
-  };
   const handleLoginButtonClick = () => {
     setLoginFormVisible(!isLoginFormVisible);
   };
 
   const handleRegistrationSuccess = () => {
+    setSnackBarData((data) => ({
+      ...data,
+      message: "User registered successfully",
+      severity: "success",
+    }));
+    setSnackBarOpen((prev) => !prev);
     setLoginFormVisible(true);
+  };
+
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackBarOpen(false);
   };
 
   return (
@@ -51,9 +70,18 @@ function LandingPage() {
         <Box></Box>
         <Box>
           {isLoginFormVisible && <LoginForm />}
-          {!isLoginFormVisible && <RegisterForm />}
+          {!isLoginFormVisible && (
+            <RegisterForm
+              handleRegistrationSuccess={handleRegistrationSuccess}
+            />
+          )}
         </Box>
       </Box>
+      <SnackBar
+        isSnackbarOpen={isSnackbarOpen}
+        handleClose={handleClose}
+        snackBarData={snackBarData}
+      />
     </Box>
   );
 }
