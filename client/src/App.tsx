@@ -2,8 +2,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import OfficerDashboard from "./views/OfficerDashBoard/OfficerDashboard.tsx";
 import OfficerLogin from "./OfficerLogin.tsx";
 import VoterDashboard from "./views/VoterDashBoard/VoterDashboard.tsx";
-import Login from "./components/LoginForm.tsx";
-import VoterRegistration from "./components/RegisterForm.tsx";
+import Login from "./components/LoginForm/LoginForm.tsx";
+import VoterRegistration from "./components/RegistrationForm/RegisterForm.tsx";
 import LandingPage from "./views/LandingPage/LandingPage.tsx";
 
 function App() {

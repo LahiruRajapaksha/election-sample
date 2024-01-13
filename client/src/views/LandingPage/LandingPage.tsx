@@ -2,8 +2,8 @@ import { Box, Button } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LoginForm from "../../components/LoginForm";
-import RegisterForm from "../../components/RegisterForm";
+import LoginForm from "../../components/LoginForm/LoginForm";
+import RegisterForm from "../../components/RegistrationForm/RegisterForm";
 //import './LandingPage.css';
 
 function LandingPage() {
@@ -15,6 +15,10 @@ function LandingPage() {
   };
   const handleLoginButtonClick = () => {
     setLoginFormVisible(!isLoginFormVisible);
+  };
+
+  const handleRegistrationSuccess = () => {
+    setLoginFormVisible(true);
   };
 
   return (

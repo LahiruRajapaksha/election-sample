@@ -1,31 +1,33 @@
-import { Button, Container, TextField, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useLoginUser } from '../utills/datahandling';
-import './LoginForm.css';
+import { Button, Container, TextField, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useLoginUser } from "../../utills/datahandling";
+import "./LoginForm.css";
 
-interface LoginProps {
-}
+interface LoginProps {}
 
 const Login: React.FC<LoginProps> = () => {
-  const { login,  isSuccess, data} = useLoginUser();
+  const { login, isSuccess, data } = useLoginUser();
+  const navigate = useNavigate();
   const [loginDetails, setLoginDetails] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
   const [errors, setErrors] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
-
-useEffect(() => {
-  if (data === 'User logged in successfully' && isSuccess) 
-  {
-    handleNavigation('/voter-dashboard');
-  }
-   if(data === 'Invalid credentials')  (setErrors({ password: 'Invalid password', email: 'Invalid email address' }));
-},[data])
+  useEffect(() => {
+    if (data === "User logged in successfully" && isSuccess) {
+      handleNavigation("/voter-dashboard");
+    }
+    if (data === "Invalid credentials")
+      setErrors({
+        password: "Invalid password",
+        email: "Invalid email address",
+      });
+  }, [data]);
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setLoginDetails({ ...loginDetails, [name]: value });
@@ -39,48 +41,44 @@ useEffect(() => {
     const isValid = validateAllFields();
 
     if (isValid) {
-      console.log('Submitted successfully', loginDetails);
+      console.log("Submitted successfully", loginDetails);
     } else {
-      console.log('Error');
+      console.log("Error");
     }
   };
-
-  const navigate = useNavigate();
 
   const handleLogin = () => {
     if (loginDetails.email && loginDetails.password) {
       login(loginDetails);
-     } 
-      if(!loginDetails.email ) {
-      setErrors((errors) => ({ ...errors, email: 'Email is required' }));
-     }
-      if(!loginDetails.password) {
-      setErrors((errors) => ({ ...errors, password: 'Password is required' }));
-     } 
-   
-    
-  }
+    }
+    if (!loginDetails.email) {
+      setErrors((errors) => ({ ...errors, email: "Email is required" }));
+    }
+    if (!loginDetails.password) {
+      setErrors((errors) => ({ ...errors, password: "Password is required" }));
+    }
+  };
   const handleNavigation = (path: string) => {
     navigate(path);
   };
 
   const validateInput = (name: string, value: string) => {
     switch (name) {
-      case 'email':
+      case "email":
         if (!value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i)) {
-          setErrors({ ...errors, email: 'Invalid email address' });
+          setErrors({ ...errors, email: "Invalid email address" });
         } else {
-          setErrors({ ...errors, email: '' });
+          setErrors({ ...errors, email: "" });
         }
         break;
-      case 'password':
+      case "password":
         if (value.length < 8) {
           setErrors({
             ...errors,
-            password: 'Password must be at least 8 characters',
+            password: "Password must be at least 8 characters",
           });
         } else {
-          setErrors({ ...errors, password: '' });
+          setErrors({ ...errors, password: "" });
         }
         break;
       default:
@@ -93,12 +91,12 @@ useEffect(() => {
   };
 
   const validateAllFields = () => {
-    const isValid = Object.values(errors).every((error) => error === '');
+    const isValid = Object.values(errors).every((error) => error === "");
     return isValid;
   };
 
   return (
-    <Container className='login-container' maxWidth="sm">
+    <Container className="login-container" maxWidth="sm">
       <Typography variant="h4" gutterBottom>
         Sign-in
       </Typography>
@@ -127,11 +125,14 @@ useEffect(() => {
           helperText={errors.password}
           error={Boolean(errors.password)}
         />
-        <Button  
-          variant="contained" 
-          type="submit" 
-          size="small" 
-          sx={{ backgroundColor: '#333', '&:hover': { backgroundColor: '#333' } }}
+        <Button
+          variant="contained"
+          type="submit"
+          size="small"
+          sx={{
+            backgroundColor: "#333",
+            "&:hover": { backgroundColor: "#333" },
+          }}
           onClick={handleLogin}
         >
           Sign-in

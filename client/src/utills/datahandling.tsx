@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useCallback } from "react";
 import { CandidateList } from "../views/VoterDashBoard/VoterDashboard";
+import { RegisterUserData } from "../components/RegistrationForm/RegisterForm";
 
 const axiosClient = axios.create({
   baseURL: "http://localhost:5000",
@@ -11,7 +12,7 @@ const axiosClient = axios.create({
 });
 
 // axios interceptors
-const registerUser = async (data: any) => {
+const registerUser = async (data: RegisterUserData) => {
   try {
     const response = await axiosClient.post("/gevs/users/register", data);
     return response.data;
@@ -74,14 +75,13 @@ export const useRegisterUser = () => {
   const {
     mutate: register,
     error,
-    isSuccess,
+    isPending,
     data,
-    status,
   } = useMutation({
     mutationKey: ["registerUser"],
-    mutationFn: (data: any) => registerUser(data),
+    mutationFn: (data: RegisterUserData) => registerUser(data),
   });
-  return { register, error, isSuccess, data };
+  return { register, error, isPending, data };
 };
 
 export const useLoginUser = () => {
@@ -90,7 +90,6 @@ export const useLoginUser = () => {
     error,
     isSuccess,
     data,
-    status,
   } = useMutation({
     mutationKey: ["loginUser"],
     mutationFn: (data: any) => loginUser(data),
