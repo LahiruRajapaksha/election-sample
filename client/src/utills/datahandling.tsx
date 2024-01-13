@@ -38,27 +38,35 @@ const loginUser = async (data: any) => {
   }
 };
 
-const getUser = async (data: any) => {
-  try {
-    const response = await axiosClient.get(`/gevs/users/register`, data);
-    return response.data;
-  } catch (error) {
-    console.error(error);
-  }
-};
-
 const updateUser = async (data: any) => {
   try {
     const response = await axiosClient.put(`/gevs/users/register`, data);
     return response.data;
   } catch (error) {
-    console.error(error);
+    if (axios.isAxiosError(error)) {
+      return error.response?.data;
+    } else {
+      return error;
+    }
   }
 };
 
 const getCandidateList = async (constituency: string) => {
   try {
     const response = await axiosClient.get(`/gevs/candidates/${constituency}`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data;
+    } else {
+      return error;
+    }
+  }
+};
+
+const getElectionResults = async () => {
+  try {
+    const response = await axiosClient.get(`/gevs/results`);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -94,14 +102,6 @@ export const useLoginUser = () => {
     mutationFn: (data: any) => loginUser(data),
   });
   return { login, error, isSuccess, data };
-};
-
-export const useGetUser = () => {
-  const { data, refetch, isLoading } = useQuery({
-    queryKey: ["getUser"],
-    queryFn: getUser,
-  });
-  return { data, refetch, isLoading };
 };
 
 export const useUpdateUser = () => {

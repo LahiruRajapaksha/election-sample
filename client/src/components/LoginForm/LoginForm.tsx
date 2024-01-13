@@ -29,7 +29,7 @@ const Login: React.FC<LoginProps> = () => {
         userType: decodedToken.userType,
         constituency: decodedToken.constituency,
         dateOfBirth: decodedToken.dateOfBirth,
-        name: decodedToken.name,
+        fullName: decodedToken.fullName,
         isVoted: decodedToken.isVoted,
         isAuthenticated: true,
       });

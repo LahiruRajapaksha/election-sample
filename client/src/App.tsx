@@ -9,25 +9,13 @@ import { useContext } from "react";
 function App() {
   const { userData } = useContext(AuthContext);
   const { userType = "", isAuthenticated } = userData;
-  console.log("isAuthenticated User: ", isAuthenticated);
+  console.log("UserType: ", userType);
+  console.log("isAuthenticated: ", isAuthenticated);
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route
-          path="/login"
-          element={
-            isAuthenticated ? (
-              userType === "voter" ? (
-                <VoterDashboard />
-              ) : (
-                <OfficerDashboard />
-              )
-            ) : (
-              <Login />
-            )
-          }
-        />
+        <Route path="/login" element={<Login />} />
         <Route
           path="/voter-dashboard"
           element={

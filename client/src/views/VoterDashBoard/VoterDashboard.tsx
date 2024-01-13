@@ -8,10 +8,10 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
-import { useContext, useEffect, useState } from "react";
+import { useContex, useContext, useState } from "react";
 import "./VoterDashboard.css";
 import { useGetCandidateList } from "../../utills/datahandling";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../Providers/AuthProvider";
 
 export type Candidate = {
@@ -30,14 +30,14 @@ export type CandidateList = {
 };
 
 const VoterDashboard = () => {
-  const { data, refetch, isLoading } = useGetCandidateList("Shangri-la-Town");
+  const { userData, logoutSuccess } = useContext(AuthContext);
+  const { data, refetch, isLoading } = useGetCandidateList(
+    userData.constituency || ""
+  );
+  console.log("UserData", userData);
   const { candidates = [], parties = [] } = data || {};
-  const location = useLocation();
-  const userDetails = location.state || {};
-  const { email = "", name = "", constituency = "" } = userDetails;
   const [selectedParty, setSelectedParty] = useState<string>("");
   const [selectedCandidate, setSelectedCandidate] = useState<string>("");
-  const { setIsAuthenticated } = useContext(AuthContext);
 
   const handleViewCandidatesClick = (partyName: string) => {
     setSelectedParty(partyName);
@@ -73,7 +73,11 @@ const VoterDashboard = () => {
         >
           GEVS - Voter Dashboard
         </Typography>
-        <Button sx={{ color: "white" }} variant="contained">
+        <Button
+          sx={{ color: "white" }}
+          variant="contained"
+          onClick={logoutSuccess}
+        >
           Logout
         </Button>
       </Box>
@@ -101,13 +105,16 @@ const VoterDashboard = () => {
               sx={{ width: 120, height: 120 }}
             />
             <Typography variant="h6" sx={{ textAlign: "left" }}>
-              {`Full Name : ${name}`}
+              {`Full Name : ${userData.fullName}`}
             </Typography>
             <Typography variant="h6" sx={{}}>
-              {`Constituency : ${constituency}`}
+              {`Constituency : ${userData.constituency}`}
             </Typography>
             <Typography variant="h6" sx={{ textAlign: "center" }}>
-              {email}
+              {` ${userData.email}`}
+            </Typography>
+            <Typography variant="h6" sx={{ textAlign: "center" }}>
+              {` ${userData.dateOfBirth}`}
             </Typography>
           </Box>
         </Card>

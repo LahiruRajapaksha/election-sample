@@ -1,9 +1,10 @@
 import { Box, Button, Card, Paper, Typography } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { PieChart } from "@mui/x-charts/PieChart";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./OfficerDashboard.css";
 import TableVote from "../../components/TableVote";
+import { AuthContext } from "../../Providers/AuthProvider";
 
 interface ElectionCommissionDashboardProps {}
 
@@ -52,6 +53,8 @@ const dataset = [
 const ElectionCommissionDashboard: React.FC<
   ElectionCommissionDashboardProps
 > = () => {
+  const { userData, logoutSuccess } = useContext(AuthContext);
+
   const [electionStarted, setElectionStarted] = useState(false);
 
   const startEndElection = () => {
@@ -74,24 +77,17 @@ const ElectionCommissionDashboard: React.FC<
           gutterBottom
           sx={{ fontSize: "2.5rem", fontWeight: "bolder", color: "white" }}
         >
-          GEVS
+          GEVS - Election Commission Dashboard
         </Typography>
-        <Button sx={{ color: "white" }} variant="contained">
+        <Button
+          sx={{ color: "white" }}
+          variant="contained"
+          onClick={logoutSuccess}
+        >
           Logout
         </Button>
       </Box>
       <Paper elevation={6} className="ec-dashboard" sx={{ mx: 2, mt: 2 }}>
-        <Typography component="h1" variant="h5">
-          Election Commission Dashboard
-        </Typography>
-        <div className="ecf-info ">
-          <div className="profile-pic-placeholder">
-            {/* Image pic should go in here */}
-          </div>
-          <div className="ec-info-text">
-            <Typography>Election Commission</Typography>
-          </div>
-        </div>
         <Button
           variant="contained"
           size="small"

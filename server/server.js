@@ -121,6 +121,7 @@ app.post("/gevs/constituency/addCandidate", async (req, res) => {
     }
 });
 
+// get candidates and parties based on constituency
 app.get("/gevs/candidates/:constituencyName", async (req, res) => {
     const { constituencyName } = req.params;
     let parties = [];
@@ -129,7 +130,6 @@ app.get("/gevs/candidates/:constituencyName", async (req, res) => {
         const userRef = await db.collection("constituency").doc(constituencyName);
         const doc = await userRef.get();
         const results = doc.data();
-        console.log(typeof (results));
         Object.keys(results).forEach((key) => {
             candidates.push({
                 name: results[key].name,
@@ -137,22 +137,39 @@ app.get("/gevs/candidates/:constituencyName", async (req, res) => {
             });
             parties.push(results[key].party);
         });
-        // results.forEach(element => {
-        //     candidates.push({
-        //         name: element.name,
-        //         party: element.party,
-        //     });
-        //     parties.push(element.party);
-        // });
         parties = [...new Set(parties)];
-
         res.status(200).send({ candidates, parties });
-        // res.status(200).send(results);
     }
     catch (error) {
         res.status(400).send(error.message);
     }
 });
+
+app.get("/gevs/results", async (req, res) => {
+    const seats = []
+    try {
+        const userRef = await db.collection("constituency");
+        const electionRef = await db.collection("election").doc("electionStatus");
+        const doc = await userRef.get();
+        const status = await electionRef.get();
+        console.log(status.data());
+        const results = doc.docs;
+        results.forEach(element => {
+            seats.push({
+                constituency: element.id,
+                candidates: element.data()
+            });
+        });
+
+        res.status(200).send({ seats });
+
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+
+});
+
+
 
 
 
