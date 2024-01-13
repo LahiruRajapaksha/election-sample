@@ -198,7 +198,6 @@ const VoterRegistration = (props: RegisterFormProps) => {
     const hasFieldErrors = validateAllFields();
     if (!hasFieldErrors) {
       register(voterDetails);
-      console.log("Registered", { ...voterDetails, isVoted: false });
     } else {
       setSnackBarData((data) => ({
         ...data,

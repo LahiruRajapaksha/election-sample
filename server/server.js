@@ -2,14 +2,13 @@ import cors from "cors";
 import express from "express";
 import admin from "firebase-admin";
 import firebasekey from "./firebase-key.json" assert { type: "json" };
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
-
+dotenv.config();
 const app = express();
-
-const corsOptions = {
-    origin: "http://localhost:5173",
-};
-app.use(cors(corsOptions));
+// enable cors
 app.use(cors());
 // parse requests of content-type - application/json
 app.use(express.json());
@@ -26,6 +25,7 @@ const db = admin.firestore();
 app.post("/gevs/users/register", async (req, res) => {
     const { email } = req.body;
     try {
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
         const userRef = db.collection("users").doc(email);
         const uvcRef = db.collection("uvc").doc(req.body.uvc);
 
@@ -36,11 +36,20 @@ app.post("/gevs/users/register", async (req, res) => {
             res.status(409).send("User already exists");
             return;
         }
+        if (!uvcDoc.exists) {
+            res.status(404).send("UVC not found");
+            return;
+        }
         if (uvcDoc.data().isUsed) {
             res.status(409).send("UVC already used");
             return;
         }
-        const results = await db.collection("users").doc(email).set({ ...req.body, isVoted: false, isAuthenticated: false, userType: "voter" });
+        const results = await db.collection("users").doc(email).set({
+            ...req.body,
+            isVoted: false,
+            userType: "voter",
+            password: hashedPassword,
+        });
         const uvcResults = await db.collection("uvc").doc(req.body.uvc).update({ isUsed: true });
         res.status(201).send("User registered successfully");
     }
@@ -51,24 +60,32 @@ app.post("/gevs/users/register", async (req, res) => {
 
 // get user data
 app.post("/gevs/user/login", async (req, res) => {
-    const {email, password} = req.body;
+    const { email, password } = req.body;
+    console.log(email, password, req.body)
     try{
         const userRef = db.collection("users").doc(email);
         const doc = await userRef.get();
-        const results = doc.data();
-        console.log(results);
-        if (!results) {
+        if (!doc.exists) {
             res.status(404).send("User not found");
             return;
         }
-        if(results.password === password && results.email === email){
-            res.status(200).send({
-                name: results.fullName,
-                email: results.email,
-                constituency: results.constituency,
-                isVoted: results.isVoted,
-                isAuthenticated: true
-            });
+        const results = doc.data();
+        if (await bcrypt.compare(password, results.password) && results.email === email) {
+            const responseData = {};
+            if (results.userType === "officer") {
+                responseData["isAuthenticated"] = true;
+                responseData["userType"] = "officer";
+                responseData["email"] = results.email;
+            } else {
+                responseData["userType"] = results.userType;
+                responseData["email"] = results.email;
+                responseData["isVoted"] = results.isVoted;
+                responseData["constituency"] = results.constituency;
+                responseData["fullName"] = results.fullName;
+                responseData["dateOfBirth"] = results.dateOfBirth;
+            }
+            const accessToken = jwt.sign(responseData, process.env.ACCESS_TOKEN_SECRET);
+            res.status(200).send({ accessToken: accessToken });
             return;
         }
         else {

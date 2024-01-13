@@ -57,7 +57,6 @@ const updateUser = async (data: any) => {
 };
 
 const getCandidateList = async (constituency: string) => {
-  console.log("Hit");
   try {
     const response = await axiosClient.get(`/gevs/candidates/${constituency}`);
     return response.data;

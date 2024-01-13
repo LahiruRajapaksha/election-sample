@@ -3,13 +3,14 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginUser } from "../../utills/datahandling";
 import "./LoginForm.css";
-import { AuthContext } from "../../Providers/AuthProvider";
+import { AuthContext, UserData } from "../../Providers/AuthProvider";
+import { jwtDecode } from "jwt-decode";
 
 interface LoginProps {}
 
 const Login: React.FC<LoginProps> = () => {
   const { login, isSuccess, data } = useLoginUser();
-  const { setIsAuthenticated, setUserType } = useContext(AuthContext);
+  const { loginSuccess } = useContext(AuthContext);
   const navigate = useNavigate();
   const [loginDetails, setLoginDetails] = useState({
     email: "",
@@ -21,17 +22,29 @@ const Login: React.FC<LoginProps> = () => {
   });
 
   useEffect(() => {
-    if (data && data.isAuthenticated && isSuccess) {
-      setIsAuthenticated(true);
-      setUserType("voter");
-      navigate("/voter-dashboard", { state: { ...data } });
+    if (data && isSuccess) {
+      const decodedToken: UserData = jwtDecode(data.accessToken);
+      loginSuccess({
+        email: decodedToken.email,
+        userType: decodedToken.userType,
+        constituency: decodedToken.constituency,
+        dateOfBirth: decodedToken.dateOfBirth,
+        name: decodedToken.name,
+        isVoted: decodedToken.isVoted,
+        isAuthenticated: true,
+      });
+      if (decodedToken.userType === "officer")
+        navigate("/officer-dashboard", { replace: true });
+      else {
+        navigate("/voter-dashboard", { replace: true });
+      }
     }
     if (data === "Invalid credentials")
       setErrors((errors) => ({
         ...errors,
         password: "Invalid email or password",
       }));
-  }, [data, navigate, isSuccess, setIsAuthenticated, setUserType]);
+  }, [data, navigate, isSuccess, loginSuccess]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;

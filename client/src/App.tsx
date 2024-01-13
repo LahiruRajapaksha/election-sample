@@ -7,7 +7,8 @@ import { AuthContext } from "./Providers/AuthProvider.tsx";
 import { useContext } from "react";
 
 function App() {
-  const { isAuthenticated, userType } = useContext(AuthContext);
+  const { userData } = useContext(AuthContext);
+  const { userType = "", isAuthenticated } = userData;
   console.log("isAuthenticated User: ", isAuthenticated);
   return (
     <BrowserRouter>
@@ -16,8 +17,12 @@ function App() {
         <Route
           path="/login"
           element={
-            isAuthenticated && userType === "voter" ? (
-              <VoterDashboard />
+            isAuthenticated ? (
+              userType === "voter" ? (
+                <VoterDashboard />
+              ) : (
+                <OfficerDashboard />
+              )
             ) : (
               <Login />
             )

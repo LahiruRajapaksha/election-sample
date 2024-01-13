@@ -1,26 +1,56 @@
 import React, { createContext, useState } from "react";
 
-export const AuthContext = createContext({
-  isAuthenticated: false,
-  setIsAuthenticated: (value: boolean) => {},
-  setUserType: (userType: string) => {},
-  userType: "",
-});
-
 type AuthProviderProps = {
   children: React.ReactNode;
 };
 
+export type UserData = {
+  email: string;
+  userType: string;
+  constituency?: string;
+  dateOfBirth?: string;
+  name?: string;
+  isVoted?: boolean;
+  isAuthenticated?: boolean;
+};
+
+type initialUserData = {
+  userData: UserData;
+  loginSuccess: (userDetails: UserData) => void;
+  logoutSucess: () => void;
+};
+
+const initialUserData: initialUserData = {
+  userData: {
+    email: "",
+    userType: "",
+    constituency: "",
+    dateOfBirth: "",
+    name: "",
+    isVoted: false,
+    isAuthenticated: false,
+  },
+  loginSuccess: () => {},
+  logoutSucess: () => {},
+};
+export const AuthContext = createContext(initialUserData);
+
 const AuthProvider = (props: AuthProviderProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userType, setUserType] = useState("");
+  const [userDetails, setUserDetails] = useState<UserData>({} as UserData);
+
+  const loginSuccess = (userDetails: UserData) => {
+    setUserDetails({ ...userDetails });
+  };
+  const logoutSucess = () => {
+    setUserDetails({} as UserData);
+  };
+
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated: isAuthenticated,
-        setIsAuthenticated: (value: boolean) => setIsAuthenticated(value),
-        userType: userType,
-        setUserType: (userType: string) => setUserType(userType),
+        userData: userDetails,
+        loginSuccess,
+        logoutSucess,
       }}
     >
       {props.children}
