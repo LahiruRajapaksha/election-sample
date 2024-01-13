@@ -94,8 +94,6 @@ export const useLoginUser = () => {
     mutationKey: ["loginUser"],
     mutationFn: (data: any) => loginUser(data),
   });
-
-  console.log("Data: ", data);
   return { login, error, isSuccess, data };
 };
 

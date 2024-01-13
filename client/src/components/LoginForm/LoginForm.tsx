@@ -1,13 +1,15 @@
-import { Button, Container, TextField, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginUser } from "../../utills/datahandling";
 import "./LoginForm.css";
+import { AuthContext } from "../../Providers/AuthProvider";
 
 interface LoginProps {}
 
 const Login: React.FC<LoginProps> = () => {
   const { login, isSuccess, data } = useLoginUser();
+  const { setIsAuthenticated, setUserType } = useContext(AuthContext);
   const navigate = useNavigate();
   const [loginDetails, setLoginDetails] = useState({
     email: "",
@@ -19,80 +21,27 @@ const Login: React.FC<LoginProps> = () => {
   });
 
   useEffect(() => {
-    if (data === "User logged in successfully" && isSuccess) {
-      handleNavigation("/voter-dashboard");
+    if (data && data.isAuthenticated && isSuccess) {
+      setIsAuthenticated(true);
+      setUserType("voter");
+      navigate("/voter-dashboard", { state: { ...data } });
     }
     if (data === "Invalid credentials")
-      setErrors({
-        password: "Invalid password",
-        email: "Invalid email address",
-      });
-  }, [data]);
+      setErrors((errors) => ({
+        ...errors,
+        password: "Invalid email or password",
+      }));
+  }, [data, navigate, isSuccess, setIsAuthenticated, setUserType]);
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
+    setErrors({ ...errors, [name]: "" });
     setLoginDetails({ ...loginDetails, [name]: value });
-
-    validateInput(name, value);
   };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-
-    const isValid = validateAllFields();
-
-    if (isValid) {
-      console.log("Submitted successfully", loginDetails);
-    } else {
-      console.log("Error");
-    }
-  };
-
-  const handleLogin = () => {
-    if (loginDetails.email && loginDetails.password) {
-      login(loginDetails);
-    }
-    if (!loginDetails.email) {
-      setErrors((errors) => ({ ...errors, email: "Email is required" }));
-    }
-    if (!loginDetails.password) {
-      setErrors((errors) => ({ ...errors, password: "Password is required" }));
-    }
-  };
-  const handleNavigation = (path: string) => {
-    navigate(path);
-  };
-
-  const validateInput = (name: string, value: string) => {
-    switch (name) {
-      case "email":
-        if (!value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i)) {
-          setErrors({ ...errors, email: "Invalid email address" });
-        } else {
-          setErrors({ ...errors, email: "" });
-        }
-        break;
-      case "password":
-        if (value.length < 8) {
-          setErrors({
-            ...errors,
-            password: "Password must be at least 8 characters",
-          });
-        } else {
-          setErrors({ ...errors, password: "" });
-        }
-        break;
-      default:
-        break;
-    }
-  };
-  const isValidEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const validateAllFields = () => {
-    const isValid = Object.values(errors).every((error) => error === "");
-    return isValid;
+    login(loginDetails);
   };
 
   return (
@@ -100,7 +49,7 @@ const Login: React.FC<LoginProps> = () => {
       <Typography variant="h4" gutterBottom>
         Sign-in
       </Typography>
-      <form onSubmit={handleSubmit}>
+      <Box component="form" onSubmit={handleSubmit}>
         <TextField
           label="Email Address"
           variant="outlined"
@@ -133,11 +82,10 @@ const Login: React.FC<LoginProps> = () => {
             backgroundColor: "#333",
             "&:hover": { backgroundColor: "#333" },
           }}
-          onClick={handleLogin}
         >
           Sign-in
         </Button>
-      </form>
+      </Box>
     </Container>
   );
 };

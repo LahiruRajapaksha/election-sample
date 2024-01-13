@@ -8,9 +8,11 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./VoterDashboard.css";
 import { useGetCandidateList } from "../../utills/datahandling";
+import { useLocation, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../Providers/AuthProvider";
 
 export type Candidate = {
   name: string;
@@ -30,13 +32,14 @@ export type CandidateList = {
 const VoterDashboard = () => {
   const { data, refetch, isLoading } = useGetCandidateList("Shangri-la-Town");
   const { candidates = [], parties = [] } = data || {};
-
+  const location = useLocation();
+  const userDetails = location.state || {};
+  const { email = "", name = "", constituency = "" } = userDetails;
   const [selectedParty, setSelectedParty] = useState<string>("");
   const [selectedCandidate, setSelectedCandidate] = useState<string>("");
-  const [voteSubmitted, setVoteSubmitted] = useState<boolean>(false);
+  const { setIsAuthenticated } = useContext(AuthContext);
 
   const handleViewCandidatesClick = (partyName: string) => {
-    // setDropdownOpen((prevState) => !prevState);
     setSelectedParty(partyName);
     setSelectedCandidate("");
   };
@@ -50,7 +53,6 @@ const VoterDashboard = () => {
     console.log(
       `You have voted for party: ${selectedParty} and candidate: ${selectedCandidate}`
     );
-    setVoteSubmitted(true);
   };
 
   return (
@@ -90,6 +92,7 @@ const VoterDashboard = () => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              p: 3,
             }}
           >
             <Avatar
@@ -97,8 +100,14 @@ const VoterDashboard = () => {
               src="/static/images/avatar/1.jpg"
               sx={{ width: 120, height: 120 }}
             />
-            <Typography variant="h5" sx={{ textAlign: "center", p: 3 }}>
-              Details
+            <Typography variant="h6" sx={{ textAlign: "left" }}>
+              {`Full Name : ${name}`}
+            </Typography>
+            <Typography variant="h6" sx={{}}>
+              {`Constituency : ${constituency}`}
+            </Typography>
+            <Typography variant="h6" sx={{ textAlign: "center" }}>
+              {email}
             </Typography>
           </Box>
         </Card>

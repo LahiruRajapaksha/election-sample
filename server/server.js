@@ -5,8 +5,16 @@ import firebasekey from "./firebase-key.json" assert { type: "json" };
 
 
 const app = express();
+
+const corsOptions = {
+    origin: "http://localhost:5173",
+};
+app.use(cors(corsOptions));
 app.use(cors());
+// parse requests of content-type - application/json
 app.use(express.json());
+// parse requests of content-type - application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }));
 
 admin.initializeApp({
     credential: admin.credential.cert(firebasekey)
@@ -32,7 +40,7 @@ app.post("/gevs/users/register", async (req, res) => {
             res.status(409).send("UVC already used");
             return;
         }
-        const results = await db.collection("users").doc(email).set(req.body);
+        const results = await db.collection("users").doc(email).set({ ...req.body, isVoted: false, isAuthenticated: false, userType: "voter" });
         const uvcResults = await db.collection("uvc").doc(req.body.uvc).update({ isUsed: true });
         res.status(201).send("User registered successfully");
     }
@@ -55,10 +63,11 @@ app.post("/gevs/user/login", async (req, res) => {
         }
         if(results.password === password && results.email === email){
             res.status(200).send({
-                name: results.name,
+                name: results.fullName,
                 email: results.email,
                 constituency: results.constituency,
                 isVoted: results.isVoted,
+                isAuthenticated: true
             });
             return;
         }
