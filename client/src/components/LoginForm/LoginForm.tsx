@@ -6,9 +6,9 @@ import "./LoginForm.css";
 import { AuthContext, UserData } from "../../Providers/AuthProvider";
 import { jwtDecode } from "jwt-decode";
 
-interface LoginProps {}
 
-const Login: React.FC<LoginProps> = () => {
+
+const Login = () => {
   const { login, isSuccess, data } = useLoginUser();
   const { loginSuccess } = useContext(AuthContext);
   const navigate = useNavigate();

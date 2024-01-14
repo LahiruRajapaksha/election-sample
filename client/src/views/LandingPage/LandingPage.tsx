@@ -1,15 +1,12 @@
 import { Box, Button } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import LoginForm from "../../components/LoginForm/LoginForm";
 import RegisterForm from "../../components/RegistrationForm/RegisterForm";
 import SnackBar from "../../components/SnackBar/SnackBar";
-//import './LandingPage.css';
 
 function LandingPage() {
-  const navigate = useNavigate();
-  const [isLoginFormVisible, setLoginFormVisible] = useState(false);
+  const [isLoginFormVisible, setLoginFormVisible] = useState(true);
   const [isSnackbarOpen, setSnackBarOpen] = useState(false);
   const [snackBarData, setSnackBarData] = useState({
     message: "",
@@ -41,13 +38,19 @@ function LandingPage() {
   };
 
   return (
-    <Box sx={{ height: "100%" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        rowGap: 10,
+      }}
+    >
       <Box
         sx={{
           backgroundColor: "#333",
           display: "flex",
           justifyContent: "space-between",
-          padding: "10px",
+          padding: 1,
           alignItems: "center",
         }}
       >
@@ -66,10 +69,18 @@ function LandingPage() {
           {isLoginFormVisible ? "Register" : "Login"}
         </Button>
       </Box>
-      <Box>
-        <Box></Box>
-        <Box>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-around",
+          alignItems: "center",
+        }}
+      >
+        <Box sx={{}}>Image</Box>
+        <Box sx={{ display: "flex", alignSelf: "flex-end" }}>
           {isLoginFormVisible && <LoginForm />}
+        </Box>
+        <Box>
           {!isLoginFormVisible && (
             <RegisterForm
               handleRegistrationSuccess={handleRegistrationSuccess}

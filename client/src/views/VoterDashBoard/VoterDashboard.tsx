@@ -11,7 +11,6 @@ import {
 import { useContex, useContext, useState } from "react";
 import "./VoterDashboard.css";
 import { useGetCandidateList } from "../../utills/datahandling";
-import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../Providers/AuthProvider";
 
 export type Candidate = {

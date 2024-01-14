@@ -163,14 +163,15 @@ export const useGetCandidateList = (
 
   let candidates: Candidate[] = [];
   let parties: string[] = [];
-  console.log("data", data.results);
-  candidates = data.results?.map((data: DistrictVoteData) => {
-    parties.push(data.party);
-    return {
-      name: data.name,
-      party: data.party,
-    };
-  });
+  candidates =
+    data &&
+    data.results?.map((data: DistrictVoteData) => {
+      parties.push(data.party);
+      return {
+        name: data.name,
+        party: data.party,
+      };
+    });
   parties = [...new Set(parties)];
   return { data: { candidates, parties }, refetch, isLoading };
 };

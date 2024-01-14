@@ -15,14 +15,14 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<LandingPage />} />
         <Route
           path="/voter-dashboard"
           element={
             isAuthenticated && userType === "voter" ? (
               <VoterDashboard />
             ) : (
-              <Login />
+              <LandingPage />
             )
           }
         />
@@ -32,7 +32,7 @@ function App() {
             isAuthenticated && userType === "officer" ? (
               <OfficerDashboard />
             ) : (
-              <Login />
+              <LandingPage />
             )
           }
         />
