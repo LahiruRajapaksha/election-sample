@@ -8,11 +8,11 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
-import { useContex, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import "./VoterDashboard.css";
 import { useGetCandidateList } from "../../utills/datahandling";
 import { AuthContext } from "../../Providers/AuthProvider";
-
+import candidateImage from "../../assets/voterImage.png";
 export type Candidate = {
   name: string;
   party: string;
@@ -30,9 +30,7 @@ export type CandidateList = {
 
 const VoterDashboard = () => {
   const { userData, logoutSuccess } = useContext(AuthContext);
-  const { data, refetch, isLoading } = useGetCandidateList(
-    userData.constituency || ""
-  );
+  const { data } = useGetCandidateList(userData.constituency || "");
   console.log("UserData", userData);
   const { candidates = [], parties = [] } = data || {};
   const [selectedParty, setSelectedParty] = useState<string>("");
@@ -100,8 +98,8 @@ const VoterDashboard = () => {
           >
             <Avatar
               alt="Remy Sharp"
-              src="/static/images/avatar/1.jpg"
-              sx={{ width: 120, height: 120 }}
+              src={candidateImage}
+              sx={{ width: 160, height: 160 }}
             />
             <Typography variant="h6" sx={{ textAlign: "left" }}>
               {`Full Name : ${userData.fullName}`}

@@ -208,8 +208,8 @@ const VoterRegistration = (props: RegisterFormProps) => {
     }
   };
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
-      <Card sx={{ maxWidth: "35%", p: 3 }}>
+    <Box sx={{ display: "flex", justifyContent: "center" }}>
+      <Card sx={{ maxWidth: "45%", height: "60%", p: 3 }}>
         <Typography variant="h4" sx={{ textAlign: "center" }}>
           Voter Registration
         </Typography>

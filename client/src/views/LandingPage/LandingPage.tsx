@@ -42,7 +42,7 @@ function LandingPage() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        rowGap: 10,
+        rowGap: 5,
       }}
     >
       <Box
