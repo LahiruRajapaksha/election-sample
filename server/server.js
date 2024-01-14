@@ -299,12 +299,12 @@ app.get("/gevs/electoral/results", async (req, res) => {
 });
 
 app.post("/gevs/consitiuency/candidate/vote", async (req, res) => {
-    const { constituencyName, candidateName, email } = req.body;
+    const { constituency, candidateName, email } = req.body;
+    console.log(req.body)
     try {
         const userRef = db.collection("users").doc(email);
         const userDoc = await userRef.get();
-
-        const constRef = await db.collection("constituency").doc(constituencyName);
+        const constRef = await db.collection("constituency").doc(constituency);
         const regionalData = await constRef.get();
 
         if (regionalData.exists && userDoc.exists) {

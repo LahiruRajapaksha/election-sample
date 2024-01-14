@@ -33,7 +33,7 @@ export type ConstituencyResult = {
 };
 
 type SubmitVoteData = {
-  party: string;
+  constituency: string;
   candidateName: string;
   email: string;
 };

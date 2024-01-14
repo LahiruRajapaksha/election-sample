@@ -77,7 +77,7 @@ const VoterDashboard = () => {
     submitVote({
       email: userData.email,
       candidateName: selectedCandidate,
-      party: selectedParty,
+      constituency: userData.constituency,
     });
   };
 
