@@ -17,53 +17,59 @@ interface ConstituencyResult {
   candidates: { name: string; votes: number }[];
 }
 
-const dataset = [
-  {
-    BlueParty: 59,
-    RedParty: 41,
-    YellowParty: 32,
-    Independent: 28,
-    constituencyName: "Shangri-la-Town",
-  },
-  {
-    BlueParty: 59,
-    RedParty: 41,
-    YellowParty: 32,
-    Independent: 28,
-    constituencyName: "Northern-Kunlun-Mountain",
-  },
-  {
-    BlueParty: 59,
-    RedParty: 41,
-    YellowParty: 32,
-    Independent: 28,
-    constituencyName: "Western-Shangri-La",
-  },
-  {
-    BlueParty: 59,
-    RedParty: 41,
-    YellowParty: 32,
-    Independent: 28,
-    constituencyName: "Naboo-Vallery",
-  },
-  {
-    BlueParty: 59,
-    RedParty: 41,
-    YellowParty: 32,
-    Independent: 28,
-    constituencyName: "New-Felucia",
-  },
-];
+// const dataset = [
+//   {
+//     BlueParty: 59,
+//     RedParty: 41,
+//     YellowParty: 32,
+//     Independent: 28,
+//     constituencyName: "Shangri-la-Town",
+//   },
+//   {
+//     BlueParty: 59,
+//     RedParty: 41,
+//     YellowParty: 32,
+//     Independent: 28,
+//     constituencyName: "Northern-Kunlun-Mountain",
+//   },
+//   {
+//     BlueParty: 59,
+//     RedParty: 41,
+//     YellowParty: 32,
+//     Independent: 28,
+//     constituencyName: "Western-Shangri-La",
+//   },
+//   {
+//     BlueParty: 59,
+//     RedParty: 41,
+//     YellowParty: 32,
+//     Independent: 28,
+//     constituencyName: "Naboo-Vallery",
+//   },
+//   {
+//     BlueParty: 59,
+//     RedParty: 41,
+//     YellowParty: 32,
+//     Independent: 28,
+//     constituencyName: "New-Felucia",
+//   },
+// ];
 const ElectionCommissionDashboard: React.FC<
   ElectionCommissionDashboardProps
 > = () => {
   const { logoutSuccess } = useContext(AuthContext);
-  const { overAllPartyResults, isAllResults, winner, status } =
+  const { overAllPartyResults, isAllResultsLoading, winner, status } =
     useGetOverAllPartyElectionResults();
-  const { resultsByConstituency, isConstituencyResults } =
-    useGetResultsByConstituency();
+  const {
+    resultsByConstituency,
+    isConstituencyResultsLoading,
+    barChartData,
+    tableData,
+  } = useGetResultsByConstituency();
 
   const [electionStarted, setElectionStarted] = useState(false);
+  // console.log("barChartData", barChartData);
+  // console.log("status", status);
 
   const startEndElection = () => {
     setElectionStarted((prev) => !prev);
@@ -222,7 +228,7 @@ const ElectionCommissionDashboard: React.FC<
               Constituencies Results
             </Typography>
             <BarChart
-              dataset={dataset}
+              dataset={barChartData || []}
               xAxis={[
                 {
                   scaleType: "band",
@@ -231,22 +237,22 @@ const ElectionCommissionDashboard: React.FC<
               ]}
               series={[
                 {
-                  dataKey: "BlueParty",
+                  dataKey: "Blue Party",
                   color: "blue",
                   label: "Blue Party",
                 },
                 {
-                  dataKey: "RedParty",
+                  dataKey: "Red Party",
                   color: "red",
                   label: "Red Party",
                 },
                 {
-                  dataKey: "YellowParty",
+                  dataKey: "Yellow Party",
                   color: "yellow",
                   label: "Yellow Party",
                 },
                 {
-                  dataKey: "Independent",
+                  dataKey: "Independent Party",
                   color: "green",
                   label: "Independent",
                 },
@@ -260,7 +266,7 @@ const ElectionCommissionDashboard: React.FC<
           <Typography variant="h6" sx={{ pb: 1 }}>
             Detailed Stats
           </Typography>
-          <TableVote />
+          <TableVote tableData={tableData} />
         </Box>
       </Box>
     </Box>

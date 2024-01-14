@@ -1,11 +1,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import {
   Candidate,
   CandidateList,
 } from "../views/VoterDashBoard/VoterDashboard";
 import { RegisterUserData } from "../components/RegistrationForm/RegisterForm";
+import { createData } from "../components/TableVote";
 
 const axiosClient = axios.create({
   baseURL: "http://localhost:5000",
@@ -18,6 +19,18 @@ type DistrictVoteData = {
   name: string;
   party: string;
   votes: number;
+};
+
+export type CandidateResults = {
+  id?: number;
+  name: string;
+  party: string;
+  vote: number;
+};
+
+export type ConstituencyResult = {
+  constituency: string;
+  results: CandidateResults[];
 };
 
 // axios interceptors
@@ -166,24 +179,25 @@ export const useGetOverAllPartyElectionResults = () => {
   const { data, refetch, isLoading } = useQuery({
     queryKey: ["getOverAllPartyElectionResults"],
     queryFn: getOverAllPartyElectionResults,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
   });
   const overAllPartyResults =
     data &&
-    data?.results?.map((index: number, result) => {
+    data.seats.map((index: number, result) => {
       return {
-        id: index + 1,
+        id: `${index} + ${1} + ${result.party}`,
         value: result.seat,
         label: result.party,
-        color: result.party.split("")[0].toLowerCase(),
+        color: result.party?.split(" ")[0].toLowerCase(),
       };
     });
   const winner = data?.winner;
   const status = data?.status;
+
   return {
     overAllPartyResults: overAllPartyResults,
     refetch,
-    isAllResults: isLoading,
+    isAllResultsLoading: isLoading,
     winner,
     status,
   };
@@ -193,11 +207,44 @@ export const useGetResultsByConstituency = () => {
   const { data, refetch, isLoading } = useQuery({
     queryKey: ["getResultsByConstituency"],
     queryFn: getResultsByConstituency,
-    // refetchInterval: 5000,
+    refetchInterval: 5000,
   });
+
+  const barChartData = Object.entries(data.constituencyTotal).map((data) => {
+    const parties = data[1];
+    if (typeof parties === "object" && parties !== null) {
+      return {
+        ...parties,
+        constituencyName: data[0],
+      };
+    }
+  });
+
+  const tableData = Object.entries(data.results as ConstituencyResult[]).map(
+    (data) => {
+      // console.log("data", data[1]);
+      return {
+        constituency: data[1].constituency,
+        results: data[1].results.map((result, index) => {
+          console.log("result.votes", result.votes);
+          return {
+            id: index + 1,
+            name: result.name,
+            party: result.party,
+            vote: result.vote,
+          };
+        }),
+      };
+    }
+  );
+  // console.log("tableData", tableData);
+  console.log("data", data.results);
+
   return {
     resultsByConstituency: data,
     refetch,
-    isConstituencyResults: isLoading,
+    isConstituencyResultsLoading: isLoading,
+    barChartData,
+    tableData,
   };
 };

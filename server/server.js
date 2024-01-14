@@ -221,7 +221,7 @@ app.get("/gevs/results", async (req, res) => {
         if (electionStatus.status === "end") {
             overallResults = {
                 status: "Completed",
-                winner: winningParty,
+                winner: winningParty.pop(),
                 seats: Object.entries(totalSeats).map(([party, seats]) => {
                     return {
                         party,
@@ -263,6 +263,7 @@ app.get("/gevs/electoral/results", async (req, res) => {
         const constituencyRef = await db.collection("constituency");
         const constSnapshot = await constituencyRef.get();
         const results = [];
+        const constituencyTotal = {};
 
         constSnapshot.forEach(doc => {
             const constituencyName = doc.id;
@@ -280,7 +281,22 @@ app.get("/gevs/electoral/results", async (req, res) => {
             });
             results.push(constituencyResult);
         });
-        res.status(200).send({ electionStatus, results });
+
+
+        constSnapshot.forEach(doc => {
+            const constituencyName = doc.id;
+            const candidates = doc.data();
+            const constituencyVotes = {};
+            Object.values(candidates).forEach(candidate => {
+                if (constituencyVotes[candidate.party]) {
+                    constituencyVotes[candidate.party] += candidate.vote;
+                } else {
+                    constituencyVotes[candidate.party] = candidate.vote;
+                }
+            });
+            constituencyTotal[constituencyName] = constituencyVotes;
+        });
+        res.status(200).send({ electionStatus, results, constituencyTotal });
     } catch (error) {
         res.status(400).send(error.message);
     }

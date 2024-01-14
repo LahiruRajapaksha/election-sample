@@ -11,39 +11,23 @@ import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
-import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { ConstituencyResult } from "../utills/datahandling";
 
-function createData(name: string) {
-  return {
-    name,
-  };
-}
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 70 },
-  { field: "candidateName", headerName: "Candidate Name", width: 130 },
-  { field: "constituency", headerName: "Constituency", width: 130 },
+  { field: "name", headerName: "Candidate Name", width: 130 },
+  { field: "party", headerName: "Party", width: 130 },
   {
-    field: "votes",
+    field: "vote",
     headerName: "No. of Votes",
     type: "number",
     width: 90,
   },
 ];
 
-const dataGridRows = [
-  { id: 1, candidateName: "Snow", constituency: "Jon", votes: 35 },
-  { id: 2, candidateName: "Lannister", constituency: "Cersei", votes: 42 },
-  { id: 3, candidateName: "Lannister", constituency: "Jaime", votes: 45 },
-  { id: 4, candidateName: "Stark", constituency: "Arya", votes: 16 },
-  { id: 5, candidateName: "Targaryen", constituency: "Daenerys", votes: null },
-  { id: 6, candidateName: "Melisandre", constituency: null, votes: 150 },
-  { id: 7, candidateName: "Clifford", constituency: "Ferrara", votes: 44 },
-  { id: 8, candidateName: "Frances", constituency: "Rossini", votes: 36 },
-  { id: 9, candidateName: "Roxie", constituency: "Harvey", votes: 65 },
-];
-
-function Row(props: { row: ReturnType<typeof createData> }) {
-  const { row } = props;
+const Row = (props: ConstituencyResult) => {
+  const { constituency, results } = props;
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -59,7 +43,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
               {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
             </IconButton>
             <Typography variant="h6" sx={{ pl: 2 }}>
-              {row.name}
+              {constituency}
             </Typography>
           </Box>
         </TableCell>
@@ -74,7 +58,7 @@ function Row(props: { row: ReturnType<typeof createData> }) {
           >
             <Box sx={{ mt: 2, mb: 2 }}>
               <DataGrid
-                rows={dataGridRows}
+                rows={results}
                 columns={columns}
                 initialState={{
                   pagination: {
@@ -89,23 +73,24 @@ function Row(props: { row: ReturnType<typeof createData> }) {
       </TableRow>
     </React.Fragment>
   );
-}
+};
 
-const rows = [
-  createData("Shangri-la-Town"),
-  createData("Northern-Kunlun-Mountain"),
-  createData("Western-Shangri-La"),
-  createData("Naboo-Vallery"),
-  createData("New-Felucia"),
-];
+type CollapseTableProps = {
+  tableData: ConstituencyResult[];
+};
 
-export default function CollapsibleTable() {
+export default function CollapsibleTable(props: CollapseTableProps) {
+  const { tableData } = props;
   return (
     <TableContainer component={Paper}>
       <Table aria-label="collapsible table">
         <TableBody>
-          {rows.map((row) => (
-            <Row key={row.name} row={row} />
+          {tableData.map((row, index) => (
+            <Row
+              key={index}
+              constituency={row.constituency}
+              results={row.results}
+            />
           ))}
         </TableBody>
       </Table>
