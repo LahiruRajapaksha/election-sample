@@ -97,7 +97,7 @@ app.post("/gevs/user/login", async (req, res) => {
     }
 });
 
-// add uvc data
+// add uvc data. this is for testing purpose
 app.post("/gevs/uvc", async (req, res) => {
     const { uvc, isUsed } = req.body;
     try {
@@ -109,7 +109,7 @@ app.post("/gevs/uvc", async (req, res) => {
     }
 });
 
-// add constituency data
+// add constituency data. this is for testing purpose
 app.post("/gevs/constituency/addCandidate", async (req, res) => {
     const { data, constituency } = req.body;
     try {
@@ -121,56 +121,195 @@ app.post("/gevs/constituency/addCandidate", async (req, res) => {
     }
 });
 
-// get candidates and parties based on constituency
-app.get("/gevs/candidates/:constituencyName", async (req, res) => {
+// get electrol district's votes
+app.get("/gevs/constituency/:constituencyName", async (req, res) => {
     const { constituencyName } = req.params;
-    let parties = [];
-    const candidates = [];
     try {
-        const userRef = await db.collection("constituency").doc(constituencyName);
-        const doc = await userRef.get();
-        const results = doc.data();
-        Object.keys(results).forEach((key) => {
-            candidates.push({
-                name: results[key].name,
-                party: results[key].party,
+        const constRef = await db.collection("constituency").doc(constituencyName);
+        const regionalData = await constRef.get();
+        const results = [];
+        if (regionalData.exists) {
+            const data = regionalData.data();
+            // Use Object.entries to iterate over the properties of the document
+            Object.entries(data).forEach(([key, doc]) => {
+                results.push({
+                    name: doc.name,
+                    party: doc.party,
+                    vote: doc.vote,
+                });
             });
-            parties.push(results[key].party);
-        });
-        parties = [...new Set(parties)];
-        res.status(200).send({ candidates, parties });
-    }
-    catch (error) {
-        res.status(400).send(error.message);
-    }
-});
-
-app.get("/gevs/results", async (req, res) => {
-    const seats = []
-    try {
-        const userRef = await db.collection("constituency");
-        const electionRef = await db.collection("election").doc("electionStatus");
-        const doc = await userRef.get();
-        const status = await electionRef.get();
-        console.log(status.data());
-        const results = doc.docs;
-        results.forEach(element => {
-            seats.push({
-                constituency: element.id,
-                candidates: element.data()
+            res.status(200).send({
+                constituency: constituencyName,
+                results
             });
-        });
-
-        res.status(200).send({ seats });
-
+        }
     } catch (error) {
         res.status(400).send(error.message);
     }
 
 });
 
+// get all electrol district's votes
+app.get("/gevs/results", async (req, res) => {
+    try {
+        const electionStatusRef = await db.collection("election").doc("electionStatus");
+        const electionSnapshot = await electionStatusRef.get();
+        const electionStatus = electionSnapshot.data();
+        const constituencyRef = await db.collection("constituency");
+        const constSnapshot = await constituencyRef.get();
+        const maxVoteCandidates = [];
 
+        let votesCast = false; // Flag to check if any votes are cast
 
+        const overallResults = {
+            status: "Pending",
+            winner: "Pending",
+            seats: []
+        };
+
+        if (electionStatus === "end") {
+            overallResults.status = "Completed";
+        } else if (electionStatus === "started") {
+            overallResults.status = "Pending";
+        } else {
+            // Assume election has not started
+            overallResults.status = "not started";
+        }
+
+        if (overallResults.status === "not started") {
+            res.status(200).send(overallResults);
+            return;
+        }
+
+        constSnapshot.forEach(doc => {
+            const constituencyName = doc.id;
+            const candidates = doc.data();
+
+            let maxVotes = -1;
+            let maxVoteCandidate = null;
+
+            // Iterate over candidates in the constituency
+            Object.values(candidates).forEach(candidate => {
+                if (candidate.vote > maxVotes) {
+                    maxVotes = candidate.vote;
+                    maxVoteCandidate = {
+                        name: candidate.name,
+                        party: candidate.party,
+                        votes: candidate.vote
+                    };
+                }
+
+                // Check if any votes are cast
+                if (candidate.vote > 0) {
+                    votesCast = true;
+                }
+            });
+
+            // Add the result to the array
+            maxVoteCandidates.push({
+                constituency: constituencyName,
+                candidate: maxVoteCandidate
+            });
+        });
+
+        // Check if any votes are cast before determining the winner
+        if (votesCast) {
+            // Calculate total seats for each party
+            const partySeats = {};
+
+            maxVoteCandidates.forEach(result => {
+                const { candidate, constituency } = result;
+
+                if (partySeats[candidate.party]) {
+                    partySeats[candidate.party]++;
+                } else {
+                    partySeats[candidate.party] = 1;
+                }
+            });
+
+            // Find the party with the most seats
+            let maxSeats = -1;
+            let winningParty = "Hung Parliament";
+
+            Object.entries(partySeats).forEach(([party, seats]) => {
+                if (seats > maxSeats) {
+                    maxSeats = seats;
+                    winningParty = party;
+                }
+            });
+
+            // Update overall results
+            overallResults.winner = winningParty;
+
+            // Format seats for each party
+            overallResults.seats = Object.entries(partySeats).map(([party, seats]) => ({
+                party,
+                seat: seats.toString()
+            }));
+        }
+
+        res.status(200).send(overallResults);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+});
+
+app.get("/gevs/electoral/results", async (req, res) => {
+    try {
+        const electionStatusRef = await db.collection("election").doc("electionStatus");
+        const electionSnapshot = await electionStatusRef.get();
+        const electionStatus = electionSnapshot.data();
+
+        const constituencyRef = await db.collection("constituency");
+        const constSnapshot = await constituencyRef.get();
+        const results = [];
+
+        constSnapshot.forEach(doc => {
+            const constituencyName = doc.id;
+            const candidates = doc.data();
+            const constituencyResult = {
+                constituency: constituencyName,
+                results: []
+            };
+            Object.values(candidates).forEach(candidate => {
+                constituencyResult.results.push({
+                    name: candidate.name,
+                    party: candidate.party,
+                    vote: candidate.vote
+                });
+            });
+            results.push(constituencyResult);
+        });
+        res.status(200).send({ electionStatus, results });
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+});
+
+app.post("/gevs/consitiuency/candidate/vote", async (req, res) => {
+    const { constituencyName, candidateName } = req.body;
+    try {
+        const constRef = await db.collection("constituency").doc(constituencyName);
+        const regionalData = await constRef.get();
+        if (regionalData.exists) {
+            const data = regionalData.data();
+            // Use Object.entries to iterate over the properties of the document
+            Object.entries(data).forEach(async ([key, doc]) => {
+                if (doc.name === candidateName) {
+                    const results = await constRef.update({
+                        [key]: {
+                            ...doc,
+                            vote: doc.vote + 1
+                        }
+                    });
+                    res.status(200).send("Vote added successfully");
+                }
+            });
+        }
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+});
 
 
 

@@ -1,7 +1,10 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useCallback } from "react";
-import { CandidateList } from "../views/VoterDashBoard/VoterDashboard";
+import {
+  Candidate,
+  CandidateList,
+} from "../views/VoterDashBoard/VoterDashboard";
 import { RegisterUserData } from "../components/RegistrationForm/RegisterForm";
 
 const axiosClient = axios.create({
@@ -10,6 +13,12 @@ const axiosClient = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+type DistrictVoteData = {
+  name: string;
+  party: string;
+  votes: number;
+};
 
 // axios interceptors
 const registerUser = async (data: RegisterUserData) => {
@@ -53,7 +62,9 @@ const updateUser = async (data: any) => {
 
 const getCandidateList = async (constituency: string) => {
   try {
-    const response = await axiosClient.get(`/gevs/candidates/${constituency}`);
+    const response = await axiosClient.get(
+      `/gevs/constituency/${constituency}`
+    );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -119,12 +130,24 @@ export const useGetCandidateList = (
   refetch: () => void;
   isLoading: boolean;
 } => {
+  console.log("constituency", constituency);
   const { data, refetch, isLoading } = useQuery({
     queryKey: ["getCandidateList", { constituency }],
     queryFn: useCallback(() => getCandidateList(constituency), [constituency]),
   });
 
-  return { data, refetch, isLoading };
+  let candidates: Candidate[] = [];
+  let parties: string[] = [];
+  console.log("data", data.results);
+  candidates = data.results?.map((data: DistrictVoteData) => {
+    parties.push(data.party);
+    return {
+      name: data.name,
+      party: data.party,
+    };
+  });
+  parties = [...new Set(parties)];
+  return { data: { candidates, parties }, refetch, isLoading };
 };
 
 
