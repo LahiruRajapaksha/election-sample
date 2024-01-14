@@ -75,9 +75,22 @@ const getCandidateList = async (constituency: string) => {
   }
 };
 
-const getElectionResults = async () => {
+const getOverAllPartyElectionResults = async () => {
   try {
     const response = await axiosClient.get(`/gevs/results`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data;
+    } else {
+      return error;
+    }
+  }
+};
+
+const getResultsByConstituency = async () => {
+  try {
+    const response = await axiosClient.get(`/gevs/electoral/results`);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -130,7 +143,6 @@ export const useGetCandidateList = (
   refetch: () => void;
   isLoading: boolean;
 } => {
-  console.log("constituency", constituency);
   const { data, refetch, isLoading } = useQuery({
     queryKey: ["getCandidateList", { constituency }],
     queryFn: useCallback(() => getCandidateList(constituency), [constituency]),
@@ -150,4 +162,42 @@ export const useGetCandidateList = (
   return { data: { candidates, parties }, refetch, isLoading };
 };
 
+export const useGetOverAllPartyElectionResults = () => {
+  const { data, refetch, isLoading } = useQuery({
+    queryKey: ["getOverAllPartyElectionResults"],
+    queryFn: getOverAllPartyElectionResults,
+    refetchInterval: 5000,
+  });
+  const overAllPartyResults =
+    data &&
+    data?.results?.map((index: number, result) => {
+      return {
+        id: index + 1,
+        value: result.seat,
+        label: result.party,
+        color: result.party.split("")[0].toLowerCase(),
+      };
+    });
+  const winner = data?.winner;
+  const status = data?.status;
+  return {
+    overAllPartyResults: overAllPartyResults,
+    refetch,
+    isAllResults: isLoading,
+    winner,
+    status,
+  };
+};
 
+export const useGetResultsByConstituency = () => {
+  const { data, refetch, isLoading } = useQuery({
+    queryKey: ["getResultsByConstituency"],
+    queryFn: getResultsByConstituency,
+    // refetchInterval: 5000,
+  });
+  return {
+    resultsByConstituency: data,
+    refetch,
+    isConstituencyResults: isLoading,
+  };
+};

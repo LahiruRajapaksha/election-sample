@@ -159,95 +159,95 @@ app.get("/gevs/results", async (req, res) => {
         const constSnapshot = await constituencyRef.get();
         const maxVoteCandidates = [];
 
-        let votesCast = false; // Flag to check if any votes are cast
+        // Calculate total votes and seats for each party
 
-        const overallResults = {
-            status: "Pending",
-            winner: "Pending",
-            seats: []
-        };
+        const totalSeats = {};
 
-        if (electionStatus === "end") {
-            overallResults.status = "Completed";
-        } else if (electionStatus === "started") {
-            overallResults.status = "Pending";
-        } else {
-            // Assume election has not started
-            overallResults.status = "not started";
-        }
-
-        if (overallResults.status === "not started") {
-            res.status(200).send(overallResults);
-            return;
-        }
+        const constituencyTotal = {};
+        const seatsPerConstituency = {};
+        const totalVotesPerConstituency = {};
 
         constSnapshot.forEach(doc => {
             const constituencyName = doc.id;
             const candidates = doc.data();
-
-            let maxVotes = -1;
-            let maxVoteCandidate = null;
-
-            // Iterate over candidates in the constituency
+            const constituencyVotes = {};
             Object.values(candidates).forEach(candidate => {
-                if (candidate.vote > maxVotes) {
-                    maxVotes = candidate.vote;
-                    maxVoteCandidate = {
-                        name: candidate.name,
-                        party: candidate.party,
-                        votes: candidate.vote
-                    };
-                }
-
-                // Check if any votes are cast
-                if (candidate.vote > 0) {
-                    votesCast = true;
+                if (constituencyVotes[candidate.party]) {
+                    constituencyVotes[candidate.party] += candidate.vote;
+                } else {
+                    constituencyVotes[candidate.party] = candidate.vote;
                 }
             });
+            constituencyTotal[constituencyName] = constituencyVotes;
+        });
 
-            // Add the result to the array
-            maxVoteCandidates.push({
-                constituency: constituencyName,
-                candidate: maxVoteCandidate
+        Object.entries(constituencyTotal).forEach(([constituencyName, votesPerParty]) => {
+            const totalVotes = Object.values(votesPerParty).reduce((acc, votes) => acc + votes, 0);
+            totalVotesPerConstituency[constituencyName] = totalVotes;
+
+            const seats = {};
+            Object.entries(votesPerParty).forEach(([party, votes]) => {
+                // Check if a party gets 2/3 or more votes in the constituency
+                if (totalVotes > 0) {
+                    seats[party] = votes >= (2 / 3) * totalVotes ? 1 : 0;
+                } else {
+                    seats[party] = 0;
+                }
+            });
+            seatsPerConstituency[constituencyName] = seats;
+        });
+
+        Object.values(seatsPerConstituency).forEach(seats => {
+            Object.entries(seats).forEach(([party, seat]) => {
+                if (totalSeats[party]) {
+                    totalSeats[party] += seat;
+                } else {
+                    totalSeats[party] = seat;
+                }
             });
         });
 
-        // Check if any votes are cast before determining the winner
-        if (votesCast) {
-            // Calculate total seats for each party
-            const partySeats = {};
+        // Determine the winner based on 2/3 of total seats
+        let winningParty = ["Hung Parliament"];
 
-            maxVoteCandidates.forEach(result => {
-                const { candidate, constituency } = result;
+        Object.entries(totalSeats).forEach(([party, seats]) => {
+            if (seats > (2 / 3) * Object.values(totalSeats).reduce((acc, s) => acc + s, 0)) {
+                winningParty.push(party);
+            }
+        });
 
-                if (partySeats[candidate.party]) {
-                    partySeats[candidate.party]++;
-                } else {
-                    partySeats[candidate.party] = 1;
-                }
-            });
+        let overallResults = {};
 
-            // Find the party with the most seats
-            let maxSeats = -1;
-            let winningParty = "Hung Parliament";
-
-            Object.entries(partySeats).forEach(([party, seats]) => {
-                if (seats > maxSeats) {
-                    maxSeats = seats;
-                    winningParty = party;
-                }
-            });
-
-            // Update overall results
-            overallResults.winner = winningParty;
-
-            // Format seats for each party
-            overallResults.seats = Object.entries(partySeats).map(([party, seats]) => ({
-                party,
-                seat: seats.toString()
-            }));
+        if (electionStatus.status === "end") {
+            overallResults = {
+                status: "Completed",
+                winner: winningParty,
+                seats: Object.entries(totalSeats).map(([party, seats]) => {
+                    return {
+                        party,
+                        seats
+                    };
+                })
+            };
+        } else if (electionStatus.status === "started") {
+            overallResults = {
+                status: "In Progress",
+                winner: "Pending",
+                seats: Object.entries(totalSeats).map(([party, seats]) => {
+                    return {
+                        party,
+                        seats
+                    };
+                })
+            };
+        } else {
+            overallResults = {
+                status: "Not Started",
+                winner: "",
+                seats: []
+            };
         }
-
+        console.log("totalSeats", overallResults);
         res.status(200).send(overallResults);
     } catch (error) {
         res.status(400).send(error.message);

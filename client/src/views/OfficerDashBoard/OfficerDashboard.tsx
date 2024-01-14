@@ -5,6 +5,10 @@ import React, { useContext, useState } from "react";
 import "./OfficerDashboard.css";
 import TableVote from "../../components/TableVote";
 import { AuthContext } from "../../Providers/AuthProvider";
+import {
+  useGetOverAllPartyElectionResults,
+  useGetResultsByConstituency,
+} from "../../utills/datahandling";
 
 interface ElectionCommissionDashboardProps {}
 
@@ -53,7 +57,11 @@ const dataset = [
 const ElectionCommissionDashboard: React.FC<
   ElectionCommissionDashboardProps
 > = () => {
-  const { userData, logoutSuccess } = useContext(AuthContext);
+  const { logoutSuccess } = useContext(AuthContext);
+  const { overAllPartyResults, isAllResults, winner, status } =
+    useGetOverAllPartyElectionResults();
+  const { resultsByConstituency, isConstituencyResults } =
+    useGetResultsByConstituency();
 
   const [electionStarted, setElectionStarted] = useState(false);
 
@@ -87,7 +95,11 @@ const ElectionCommissionDashboard: React.FC<
           Logout
         </Button>
       </Box>
-      <Paper elevation={6} className="ec-dashboard" sx={{ mx: 2, mt: 2 }}>
+      <Paper
+        elevation={6}
+        className="ec-dashboard"
+        sx={{ mx: 2, mt: 2, display: "flex", alignItems: "center" }}
+      >
         <Button
           variant="contained"
           size="small"
@@ -101,6 +113,36 @@ const ElectionCommissionDashboard: React.FC<
         >
           {electionStarted ? "End Election" : "Start Election"}
         </Button>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Typography variant="h6" sx={{ pl: 2, fontWeight: "bold" }}>
+            Election status:
+          </Typography>
+          <Box
+            sx={{
+              width: 20,
+              height: 20,
+              borderRadius: "50%",
+              backgroundColor:
+                status === "Completed"
+                  ? "yellow"
+                  : status === "In Progress"
+                  ? "green"
+                  : "red",
+              ml: 2,
+            }}
+          />
+          <Typography variant="h6" sx={{ pl: 1 }}>
+            {status}
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Typography variant="h6" sx={{ pl: 2, fontWeight: "bold" }}>
+            WINNER:
+          </Typography>
+          <Typography variant="h6" sx={{ pl: 1 }}>
+            {winner}
+          </Typography>
+        </Box>
       </Paper>
       <Box
         sx={{
@@ -135,32 +177,33 @@ const ElectionCommissionDashboard: React.FC<
                     additionalRadius: -20,
                     color: "gray",
                   },
-                  data: [
-                    {
-                      id: 0,
-                      value: 10,
-                      label: "Blue Party",
-                      color: "blue",
-                    },
-                    {
-                      id: 1,
-                      value: 15,
-                      label: "Red Party",
-                      color: "red",
-                    },
-                    {
-                      id: 2,
-                      value: 20,
-                      label: "Yellow Party",
-                      color: "yellow",
-                    },
-                    {
-                      id: 3,
-                      value: 25,
-                      label: "Independent",
-                      color: "green",
-                    },
-                  ],
+                  data: overAllPartyResults || [],
+                  //   [
+                  //   {
+                  //     id: 0,
+                  //     value: 10,
+                  //     label: "Blue Party",
+                  //     color: "blue",
+                  //   },
+                  //   {
+                  //     id: 1,
+                  //     value: 15,
+                  //     label: "Red Party",
+                  //     color: "red",
+                  //   },
+                  //   {
+                  //     id: 2,
+                  //     value: 20,
+                  //     label: "Yellow Party",
+                  //     color: "yellow",
+                  //   },
+                  //   {
+                  //     id: 3,
+                  //     value: 25,
+                  //     label: "Independent",
+                  //     color: "green",
+                  //   },
+                  // ],
                 },
               ]}
               width={400}
