@@ -8,11 +8,12 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./VoterDashboard.css";
-import { useGetCandidateList } from "../../utills/datahandling";
+import { useGetCandidateList, useSubmitVote } from "../../utills/datahandling";
 import { AuthContext } from "../../Providers/AuthProvider";
 import candidateImage from "../../assets/voterImage.png";
+import SnackBar from "../../components/SnackBar/SnackBar";
 export type Candidate = {
   name: string;
   party: string;
@@ -30,8 +31,13 @@ export type CandidateList = {
 
 const VoterDashboard = () => {
   const { userData, logoutSuccess } = useContext(AuthContext);
+  const { submitVote, submitVoteResponse } = useSubmitVote();
   const { data } = useGetCandidateList(userData.constituency || "");
-  console.log("UserData", userData);
+  const [isSnackbarOpen, setSnackBarOpen] = useState(false);
+  const [snackBarData, setSnackBarData] = useState({
+    message: "",
+    severity: "",
+  });
   const { candidates = [], parties = [] } = data || {};
   const [selectedParty, setSelectedParty] = useState<string>("");
   const [selectedCandidate, setSelectedCandidate] = useState<string>("");
@@ -41,15 +47,38 @@ const VoterDashboard = () => {
     setSelectedCandidate("");
   };
 
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackBarOpen(false);
+  };
+
   const handleCandidateChange = (event: SelectChangeEvent<string>) => {
     setSelectedCandidate(event.target.value as string);
   };
 
+  useEffect(() => {
+    if (submitVoteResponse === "Vote added successfully") {
+      setSnackBarData((data) => ({
+        ...data,
+        message: "Vote submitted successfully",
+        severity: "success",
+      }));
+      setSnackBarOpen((prev) => !prev);
+    }
+  }, [submitVoteResponse]);
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(
-      `You have voted for party: ${selectedParty} and candidate: ${selectedCandidate}`
-    );
+    submitVote({
+      email: userData.email,
+      candidateName: selectedCandidate,
+      party: selectedParty,
+    });
   };
 
   return (
@@ -115,59 +144,68 @@ const VoterDashboard = () => {
             </Typography>
           </Box>
         </Card>
-        <Card sx={{ flexGrow: 2 }}>
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h5" sx={{ textAlign: "center" }}>
-              Cast Your Vote
-            </Typography>
-            <form onSubmit={handleSubmit}>
-              <Typography variant="h6">Select Party</Typography>
-              <Select
-                sx={{ width: "100%" }}
-                value={selectedParty}
-                onChange={(event) =>
-                  handleViewCandidatesClick(event.target.value)
-                }
-              >
-                {parties.map((party: string, index: number) => (
-                  <MenuItem key={`${index}-${party}`} value={party}>
-                    {party}
-                  </MenuItem>
-                ))}
-              </Select>
-              {selectedParty && (
-                <Box>
-                  <Typography variant="h6">Select Candidate</Typography>
-                  <Select
-                    sx={{ width: "100%" }}
-                    value={selectedCandidate}
-                    onChange={handleCandidateChange}
-                  >
-                    {candidates
-                      .filter((candidate) => candidate.party === selectedParty)
-                      .map((candidate: Candidate, index: number) => (
-                        <MenuItem
-                          key={`${index}-${candidate.name}`}
-                          value={candidate.name}
-                        >
-                          {candidate.name}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </Box>
-              )}
-              <Button
-                sx={{ marginTop: "10px" }}
-                variant="contained"
-                type="submit"
-                disabled={!selectedCandidate || !selectedParty}
-              >
-                Submit
-              </Button>
-            </form>
-          </Box>
-        </Card>
+        {!userData.isVoted && (
+          <Card sx={{ flexGrow: 2 }}>
+            <Box sx={{ p: 3 }}>
+              <Typography variant="h5" sx={{ textAlign: "center" }}>
+                Cast Your Vote
+              </Typography>
+              <form onSubmit={handleSubmit}>
+                <Typography variant="h6">Select Party</Typography>
+                <Select
+                  sx={{ width: "100%" }}
+                  value={selectedParty}
+                  onChange={(event) =>
+                    handleViewCandidatesClick(event.target.value)
+                  }
+                >
+                  {parties.map((party: string, index: number) => (
+                    <MenuItem key={`${index}-${party}`} value={party}>
+                      {party}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {selectedParty && (
+                  <Box>
+                    <Typography variant="h6">Select Candidate</Typography>
+                    <Select
+                      sx={{ width: "100%" }}
+                      value={selectedCandidate}
+                      onChange={handleCandidateChange}
+                    >
+                      {candidates
+                        .filter(
+                          (candidate) => candidate.party === selectedParty
+                        )
+                        .map((candidate: Candidate, index: number) => (
+                          <MenuItem
+                            key={`${index}-${candidate.name}`}
+                            value={candidate.name}
+                          >
+                            {candidate.name}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </Box>
+                )}
+                <Button
+                  sx={{ marginTop: "10px" }}
+                  variant="contained"
+                  type="submit"
+                  disabled={!selectedCandidate || !selectedParty}
+                >
+                  Submit
+                </Button>
+              </form>
+            </Box>
+          </Card>
+        )}
       </Box>
+      <SnackBar
+        isSnackbarOpen={isSnackbarOpen}
+        handleClose={handleClose}
+        snackBarData={snackBarData}
+      />
     </Box>
   );
 };

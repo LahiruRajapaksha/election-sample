@@ -299,11 +299,15 @@ app.get("/gevs/electoral/results", async (req, res) => {
 });
 
 app.post("/gevs/consitiuency/candidate/vote", async (req, res) => {
-    const { constituencyName, candidateName } = req.body;
+    const { constituencyName, candidateName, email } = req.body;
     try {
+        const userRef = db.collection("users").doc(email);
+        const userDoc = await userRef.get();
+
         const constRef = await db.collection("constituency").doc(constituencyName);
         const regionalData = await constRef.get();
-        if (regionalData.exists) {
+
+        if (regionalData.exists && userDoc.exists) {
             const data = regionalData.data();
             // Use Object.entries to iterate over the properties of the document
             Object.entries(data).forEach(async ([key, doc]) => {
@@ -314,15 +318,36 @@ app.post("/gevs/consitiuency/candidate/vote", async (req, res) => {
                             vote: doc.vote + 1
                         }
                     });
-                    res.status(200).send("Vote added successfully");
                 }
             });
+            const userResults = await userRef.update({ isVoted: true });
         }
+        res.status(200).send("Vote added successfully");
     } catch (error) {
         res.status(400).send(error.message);
     }
 });
 
+// start end election
+app.post("/gevs/election/start", async (req, res) => {
+    const { startElection } = req.body;
+    try {
+        const electionStatusRef = await db.collection("election").doc("electionStatus");
+        const electionSnapshot = await electionStatusRef.get();
+        const electionStatus = electionSnapshot.data();
+        if (startElection) {
+            const results = await electionStatusRef.update({ status: "started" });
+            res.status(200).send("Election started successfully");
+            return
+        } else {
+            const results = await electionStatusRef.update({ status: "end" });
+            res.status(200).send("Election ended successfully");
+            return
+        }
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+});
 
 
 const PORT = 5000 || process.env.PORT;

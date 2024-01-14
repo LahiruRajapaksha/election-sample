@@ -18,6 +18,7 @@ type initialUserData = {
   userData: UserData;
   loginSuccess: (userDetails: UserData) => void;
   logoutSuccess: () => void;
+  onVoteSuccess: () => void;
 };
 
 const initialUserData: initialUserData = {
@@ -32,6 +33,7 @@ const initialUserData: initialUserData = {
   },
   loginSuccess: () => {},
   logoutSuccess: () => {},
+  onVoteSuccess: () => {},
 };
 export const AuthContext = createContext(initialUserData);
 
@@ -44,16 +46,6 @@ const AuthProvider = (props: AuthProviderProps) => {
     if (storedUserDetails) {
       setUserDetails(JSON.parse(storedUserDetails));
     }
-    // // Cleanup localStorage when the window is closed
-    // const handleWindowClose = () => {
-    //   localStorage.removeItem("userDetails");
-    // };
-
-    // window.addEventListener("beforeunload", handleWindowClose);
-
-    // return () => {
-    //   window.removeEventListener("beforeunload", handleWindowClose);
-    // };
   }, []);
 
   const loginSuccess = (userDetails: UserData) => {
@@ -67,12 +59,21 @@ const AuthProvider = (props: AuthProviderProps) => {
     localStorage.removeItem("userDetails");
   };
 
+  const onVoteSuccess = () => {
+    setUserDetails((userDetails) => ({
+      ...userDetails,
+      isVoted: true,
+    }));
+    localStorage.setItem("userDetails", JSON.stringify(userDetails));
+  };
+
   return (
     <AuthContext.Provider
       value={{
         userData: userDetails,
         loginSuccess,
         logoutSuccess,
+        onVoteSuccess,
       }}
     >
       {props.children}

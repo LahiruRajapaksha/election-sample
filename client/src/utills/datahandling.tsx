@@ -1,12 +1,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import {
   Candidate,
   CandidateList,
 } from "../views/VoterDashBoard/VoterDashboard";
 import { RegisterUserData } from "../components/RegistrationForm/RegisterForm";
-import { createData } from "../components/TableVote";
 
 const axiosClient = axios.create({
   baseURL: "http://localhost:5000",
@@ -31,6 +30,12 @@ export type CandidateResults = {
 export type ConstituencyResult = {
   constituency: string;
   results: CandidateResults[];
+};
+
+type SubmitVoteData = {
+  party: string;
+  candidateName: string;
+  email: string;
 };
 
 // axios interceptors
@@ -104,6 +109,37 @@ const getOverAllPartyElectionResults = async () => {
 const getResultsByConstituency = async () => {
   try {
     const response = await axiosClient.get(`/gevs/electoral/results`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data;
+    } else {
+      return error;
+    }
+  }
+};
+
+const submitVote = async (data: SubmitVoteData) => {
+  try {
+    const response = await axiosClient.post(
+      "/gevs/consitiuency/candidate/vote",
+      data
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data;
+    } else {
+      return error;
+    }
+  }
+};
+
+const startEndElection = async (startElection: boolean) => {
+  try {
+    const response = await axiosClient.post("/gevs/election/start", {
+      startElection,
+    });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -251,5 +287,29 @@ export const useGetResultsByConstituency = () => {
     isConstituencyResultsLoading: isLoading,
     barChartData,
     tableData,
+  };
+};
+
+export const useSubmitVote = () => {
+  const { mutate, data } = useMutation({
+    mutationKey: ["submitVote"],
+    mutationFn: (voteData: SubmitVoteData) => submitVote(voteData),
+  });
+  return { submitVote: mutate, submitVoteResponse: data };
+};
+
+export const useStartEndElection = () => {
+  const {
+    mutate: startEndElectionMutation,
+    data,
+    isPending,
+  } = useMutation({
+    mutationKey: ["startEndElection"],
+    mutationFn: (value: boolean) => startEndElection(value),
+  });
+  return {
+    startEndElectionMutation,
+    electionToggleData: data,
+    isElectionStarting: isPending,
   };
 };

@@ -1,14 +1,16 @@
 import { Box, Button, Card, Paper, Typography } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { PieChart } from "@mui/x-charts/PieChart";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./OfficerDashboard.css";
 import TableVote from "../../components/TableVote";
 import { AuthContext } from "../../Providers/AuthProvider";
 import {
   useGetOverAllPartyElectionResults,
   useGetResultsByConstituency,
+  useStartEndElection,
 } from "../../utills/datahandling";
+import SnackBar from "../../components/SnackBar/SnackBar";
 
 interface ElectionCommissionDashboardProps {}
 
@@ -19,14 +21,40 @@ const ElectionCommissionDashboard: React.FC<
   const { overAllPartyResults, winner, status } =
     useGetOverAllPartyElectionResults();
   const { barChartData, tableData } = useGetResultsByConstituency();
+  const { electionToggleData, isElectionStarting, startEndElectionMutation } =
+    useStartEndElection();
 
   const [electionStarted, setElectionStarted] = useState(false);
-  // console.log("barChartData", barChartData);
-  // console.log("status", status);
+  const [isSnackbarOpen, setSnackBarOpen] = useState(false);
+  const [snackBarData, setSnackBarData] = useState({
+    message: "",
+    severity: "",
+  });
 
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackBarOpen(false);
+  };
   const startEndElection = () => {
     setElectionStarted((prev) => !prev);
+    startEndElectionMutation(!electionStarted);
   };
+
+  useEffect(() => {
+    if (electionToggleData) {
+      setSnackBarData((data) => ({
+        ...data,
+        message: electionToggleData,
+        severity: "success",
+      }));
+      setSnackBarOpen((prev) => !prev);
+    }
+  }, [electionToggleData]);
 
   return (
     <Box>
@@ -70,7 +98,11 @@ const ElectionCommissionDashboard: React.FC<
           }}
           onClick={startEndElection}
         >
-          {electionStarted ? "End Election" : "Start Election"}
+          {isElectionStarting
+            ? "Loading..."
+            : electionStarted
+            ? "End Election"
+            : "Start Election"}
         </Button>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Typography variant="h6" sx={{ pl: 2, fontWeight: "bold" }}>
@@ -196,6 +228,11 @@ const ElectionCommissionDashboard: React.FC<
           <TableVote tableData={tableData} />
         </Box>
       </Box>
+      <SnackBar
+        isSnackbarOpen={isSnackbarOpen}
+        handleClose={handleClose}
+        snackBarData={snackBarData}
+      />
     </Box>
   );
 };

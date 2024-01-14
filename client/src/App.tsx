@@ -1,7 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import OfficerDashboard from "./views/OfficerDashBoard/OfficerDashboard.tsx";
 import VoterDashboard from "./views/VoterDashBoard/VoterDashboard.tsx";
-import Login from "./components/LoginForm/LoginForm.tsx";
 import LandingPage from "./views/LandingPage/LandingPage.tsx";
 import { AuthContext } from "./Providers/AuthProvider.tsx";
 import { useContext } from "react";
