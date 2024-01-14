@@ -22,7 +22,7 @@ const Login = () => {
   });
 
   useEffect(() => {
-    if (data && isSuccess) {
+    if (data && data.accessToken && isSuccess) {
       const decodedToken: UserData = jwtDecode(data.accessToken);
       loginSuccess({
         email: decodedToken.email,
