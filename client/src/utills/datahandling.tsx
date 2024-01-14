@@ -183,6 +183,7 @@ export const useGetOverAllPartyElectionResults = () => {
   });
   const overAllPartyResults =
     data &&
+    data.seats.length > 0 &&
     data.seats.map((data: { party: string; seats: number }, index: number) => {
       return {
         id: `${index} + ${Math.random()}`,
@@ -213,18 +214,23 @@ export const useGetResultsByConstituency = () => {
     refetchInterval: 8000,
   });
 
-  const barChartData = Object.entries(data.constituencyTotal).map((data) => {
-    const parties = data[1];
-    if (typeof parties === "object" && parties !== null) {
-      return {
-        ...parties,
-        constituencyName: data[0],
-      };
-    }
-  });
+  const barChartData =
+    data &&
+    data.constituencyTotal &&
+    Object.entries(data.constituencyTotal).map((data) => {
+      const parties = data[1];
+      if (typeof parties === "object" && parties !== null) {
+        return {
+          ...parties,
+          constituencyName: data[0],
+        };
+      }
+    });
 
-  const tableData = Object.entries(data.results as ConstituencyResult[]).map(
-    (data) => {
+  const tableData =
+    data &&
+    data.results.length > 0 &&
+    Object.entries(data.results as ConstituencyResult[]).map((data) => {
       return {
         constituency: data[1].constituency,
         results: data[1].results.map((result, index) => {
@@ -236,8 +242,7 @@ export const useGetResultsByConstituency = () => {
           };
         }),
       };
-    }
-  );
+    });
 
   return {
     resultsByConstituency: data,

@@ -80,7 +80,7 @@ type CollapseTableProps = {
 };
 
 export default function CollapsibleTable(props: CollapseTableProps) {
-  const { tableData } = props;
+  const { tableData = [] } = props;
   return (
     <TableContainer component={Paper}>
       <Table aria-label="collapsible table">

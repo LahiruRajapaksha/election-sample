@@ -155,7 +155,7 @@ const ElectionCommissionDashboard: React.FC<
               Constituencies Results
             </Typography>
             <BarChart
-              dataset={barChartData || []}
+              dataset={barChartData || [{}]}
               xAxis={[
                 {
                   scaleType: "band",
