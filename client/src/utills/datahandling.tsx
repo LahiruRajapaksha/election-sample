@@ -179,24 +179,27 @@ export const useGetOverAllPartyElectionResults = () => {
   const { data, refetch, isLoading } = useQuery({
     queryKey: ["getOverAllPartyElectionResults"],
     queryFn: getOverAllPartyElectionResults,
-    // refetchInterval: 5000,
+    refetchInterval: 5000,
   });
   const overAllPartyResults =
     data &&
-    data.seats.map((index: number, result) => {
+    data.seats.map((data: { party: string; seats: number }, index: number) => {
       return {
-        id: `${index} + ${1} + ${result.party}`,
-        value: result.seat,
-        label: result.party,
-        color: result.party?.split(" ")[0].toLowerCase(),
+        id: `${index} + ${Math.random()}`,
+        value: data.seats,
+        label: data.party,
+        color:
+          data.party === "Independent Party"
+            ? "green"
+            : data.party?.split(" ")[0].toLowerCase(),
       };
     });
-  const winner = data?.winner;
-  const status = data?.status;
-
+  const winner: string = data?.winner;
+  const status: string = data?.status;
   return {
     overAllPartyResults: overAllPartyResults,
     refetch,
+    data,
     isAllResultsLoading: isLoading,
     winner,
     status,
@@ -207,7 +210,7 @@ export const useGetResultsByConstituency = () => {
   const { data, refetch, isLoading } = useQuery({
     queryKey: ["getResultsByConstituency"],
     queryFn: getResultsByConstituency,
-    refetchInterval: 5000,
+    refetchInterval: 8000,
   });
 
   const barChartData = Object.entries(data.constituencyTotal).map((data) => {
@@ -222,11 +225,9 @@ export const useGetResultsByConstituency = () => {
 
   const tableData = Object.entries(data.results as ConstituencyResult[]).map(
     (data) => {
-      // console.log("data", data[1]);
       return {
         constituency: data[1].constituency,
         results: data[1].results.map((result, index) => {
-          console.log("result.votes", result.votes);
           return {
             id: index + 1,
             name: result.name,
@@ -237,8 +238,6 @@ export const useGetResultsByConstituency = () => {
       };
     }
   );
-  // console.log("tableData", tableData);
-  console.log("data", data.results);
 
   return {
     resultsByConstituency: data,

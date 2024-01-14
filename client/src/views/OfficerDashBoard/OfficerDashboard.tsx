@@ -12,60 +12,13 @@ import {
 
 interface ElectionCommissionDashboardProps {}
 
-interface ConstituencyResult {
-  constituencyName: string;
-  candidates: { name: string; votes: number }[];
-}
-
-// const dataset = [
-//   {
-//     BlueParty: 59,
-//     RedParty: 41,
-//     YellowParty: 32,
-//     Independent: 28,
-//     constituencyName: "Shangri-la-Town",
-//   },
-//   {
-//     BlueParty: 59,
-//     RedParty: 41,
-//     YellowParty: 32,
-//     Independent: 28,
-//     constituencyName: "Northern-Kunlun-Mountain",
-//   },
-//   {
-//     BlueParty: 59,
-//     RedParty: 41,
-//     YellowParty: 32,
-//     Independent: 28,
-//     constituencyName: "Western-Shangri-La",
-//   },
-//   {
-//     BlueParty: 59,
-//     RedParty: 41,
-//     YellowParty: 32,
-//     Independent: 28,
-//     constituencyName: "Naboo-Vallery",
-//   },
-//   {
-//     BlueParty: 59,
-//     RedParty: 41,
-//     YellowParty: 32,
-//     Independent: 28,
-//     constituencyName: "New-Felucia",
-//   },
-// ];
 const ElectionCommissionDashboard: React.FC<
   ElectionCommissionDashboardProps
 > = () => {
   const { logoutSuccess } = useContext(AuthContext);
-  const { overAllPartyResults, isAllResultsLoading, winner, status } =
+  const { overAllPartyResults, winner, status } =
     useGetOverAllPartyElectionResults();
-  const {
-    resultsByConstituency,
-    isConstituencyResultsLoading,
-    barChartData,
-    tableData,
-  } = useGetResultsByConstituency();
+  const { barChartData, tableData } = useGetResultsByConstituency();
 
   const [electionStarted, setElectionStarted] = useState(false);
   // console.log("barChartData", barChartData);
@@ -184,32 +137,6 @@ const ElectionCommissionDashboard: React.FC<
                     color: "gray",
                   },
                   data: overAllPartyResults || [],
-                  //   [
-                  //   {
-                  //     id: 0,
-                  //     value: 10,
-                  //     label: "Blue Party",
-                  //     color: "blue",
-                  //   },
-                  //   {
-                  //     id: 1,
-                  //     value: 15,
-                  //     label: "Red Party",
-                  //     color: "red",
-                  //   },
-                  //   {
-                  //     id: 2,
-                  //     value: 20,
-                  //     label: "Yellow Party",
-                  //     color: "yellow",
-                  //   },
-                  //   {
-                  //     id: 3,
-                  //     value: 25,
-                  //     label: "Independent",
-                  //     color: "green",
-                  //   },
-                  // ],
                 },
               ]}
               width={400}

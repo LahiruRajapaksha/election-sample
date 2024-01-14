@@ -157,9 +157,6 @@ app.get("/gevs/results", async (req, res) => {
         const electionStatus = electionSnapshot.data();
         const constituencyRef = await db.collection("constituency");
         const constSnapshot = await constituencyRef.get();
-        const maxVoteCandidates = [];
-
-        // Calculate total votes and seats for each party
 
         const totalSeats = {};
 
@@ -247,7 +244,6 @@ app.get("/gevs/results", async (req, res) => {
                 seats: []
             };
         }
-        console.log("totalSeats", overallResults);
         res.status(200).send(overallResults);
     } catch (error) {
         res.status(400).send(error.message);
