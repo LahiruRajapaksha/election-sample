@@ -160,7 +160,7 @@ const ElectionCommissionDashboard: React.FC<
             }}
           >
             <Typography variant="h6" sx={{ py: 2, fontWeight: "bold" }}>
-              Party Results
+              Total Number of Seats
             </Typography>
             <Box
               sx={{
@@ -253,7 +253,7 @@ const ElectionCommissionDashboard: React.FC<
         </Card>
         <Box sx={{ pb: 5 }}>
           <Typography variant="h6" sx={{ my: 2, ml: 2, fontWeight: "bold" }}>
-            Vote count for each candidate
+            Vote Count For Each Candidate
           </Typography>
           <TableVote tableData={tableData} />
         </Box>
