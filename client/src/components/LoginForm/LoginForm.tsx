@@ -1,18 +1,20 @@
-import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, TextField, Typography } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginUser } from "../../utills/datahandling";
-import "./LoginForm.css";
 import { AuthContext, UserData } from "../../Providers/AuthProvider";
 import { jwtDecode } from "jwt-decode";
 
-
+export type LoginDetails = {
+  email: string;
+  password: string;
+};
 
 const Login = () => {
-  const { login, isSuccess, data } = useLoginUser();
+  const { login, isSuccess, data, isLoginPending } = useLoginUser();
   const { loginSuccess } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [loginDetails, setLoginDetails] = useState({
+  const [loginDetails, setLoginDetails] = useState<LoginDetails>({
     email: "",
     password: "",
   });
@@ -55,11 +57,17 @@ const Login = () => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    login(loginDetails);
+    if (!loginDetails.email) {
+      setErrors((errors) => ({ ...errors, email: "Email is required" }));
+    } else if (!loginDetails.password) {
+      setErrors((errors) => ({ ...errors, password: "Password is required" }));
+    } else {
+      login(loginDetails);
+    }
   };
 
   return (
-    <Container className="login-container" maxWidth="sm">
+    <Card sx={{ p: 4 }}>
       <Typography variant="h4" gutterBottom>
         Sign-in
       </Typography>
@@ -96,11 +104,12 @@ const Login = () => {
             backgroundColor: "#333",
             "&:hover": { backgroundColor: "#333" },
           }}
+          disabled={isLoginPending}
         >
-          Sign-in
+          {isLoginPending ? "Signing" : "Sign-in"}
         </Button>
       </Box>
-    </Container>
+    </Card>
   );
 };
 

@@ -23,11 +23,13 @@
     "jwt-decode": "^4.0.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
+    "react-clock": "^4.6.0",
     "react-dom": "^18.2.0",
     "react-qr-reader": "^2.2.1",
     "react-router-dom": "^6.21.1"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@types/react-qr-reader": "^2.1.7",

@@ -54,7 +54,6 @@ const AuthProvider = (props: AuthProviderProps) => {
 
   const loginSuccess = (userDetails: UserData) => {
     setUserDetails({ ...userDetails });
-    console.log("UserDetails: ", userDetails);
     localStorage.setItem("userDetails", JSON.stringify(userDetails));
   };
 

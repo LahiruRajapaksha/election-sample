@@ -4,7 +4,7 @@ import { useState } from "react";
 import LoginForm from "../../components/LoginForm/LoginForm";
 import RegisterForm from "../../components/RegistrationForm/RegisterForm";
 import SnackBar from "../../components/SnackBar/SnackBar";
-
+import landingPageImage from "../../assets/landingPageImage.jpg";
 function LandingPage() {
   const [isLoginFormVisible, setLoginFormVisible] = useState(true);
   const [isSnackbarOpen, setSnackBarOpen] = useState(false);
@@ -55,14 +55,14 @@ function LandingPage() {
         }}
       >
         <Typography
-          variant="h1"
+          variant="h3"
           gutterBottom
-          sx={{ fontSize: "2.5rem", fontWeight: "bolder", color: "white" }}
+          sx={{ fontWeight: "bold", color: "white", ml: 4, mt: 1 }}
         >
           GEVS
         </Typography>
         <Button
-          sx={{ color: "white" }}
+          sx={{ color: "white", mr: 4 }}
           variant="contained"
           onClick={handleLoginButtonClick}
         >
@@ -76,10 +76,15 @@ function LandingPage() {
           alignItems: "center",
         }}
       >
-        <Box sx={{}}>Image</Box>
-        <Box sx={{ display: "flex", alignSelf: "flex-end" }}>
-          {isLoginFormVisible && <LoginForm />}
-        </Box>
+        {isLoginFormVisible && (
+          <Box
+            component="img"
+            src={landingPageImage}
+            alt="landing page image"
+            sx={{ maxWidth: "45%", borderRadius: 2 }}
+          />
+        )}
+        {isLoginFormVisible && <LoginForm />}
         <Box>
           {!isLoginFormVisible && (
             <RegisterForm

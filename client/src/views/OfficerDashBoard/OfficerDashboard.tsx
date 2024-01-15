@@ -1,8 +1,7 @@
-import { Box, Button, Card, Paper, Typography } from "@mui/material";
+import { Box, Button, Card, Typography } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { PieChart } from "@mui/x-charts/PieChart";
 import React, { useContext, useEffect, useState } from "react";
-import "./OfficerDashboard.css";
 import TableVote from "../../components/TableVote";
 import { AuthContext } from "../../Providers/AuthProvider";
 import {
@@ -18,13 +17,14 @@ const ElectionCommissionDashboard: React.FC<
   ElectionCommissionDashboardProps
 > = () => {
   const { logoutSuccess } = useContext(AuthContext);
-  const { overAllPartyResults, winner, status } =
+  const { overAllPartyResults, winner, status, parties } =
     useGetOverAllPartyElectionResults();
   const { barChartData, tableData } = useGetResultsByConstituency();
   const { electionToggleData, isElectionStarting, startEndElectionMutation } =
     useStartEndElection();
 
   const [electionStarted, setElectionStarted] = useState(false);
+  const [isElectionStarted, setIsElectionStarted] = useState(false);
   const [isSnackbarOpen, setSnackBarOpen] = useState(false);
   const [snackBarData, setSnackBarData] = useState({
     message: "",
@@ -53,6 +53,7 @@ const ElectionCommissionDashboard: React.FC<
         severity: "success",
       }));
       setSnackBarOpen((prev) => !prev);
+      setIsElectionStarted((prev) => !prev);
     }
   }, [electionToggleData]);
 
@@ -82,25 +83,24 @@ const ElectionCommissionDashboard: React.FC<
           Logout
         </Button>
       </Box>
-      <Paper
+      <Card
         elevation={6}
-        className="ec-dashboard"
-        sx={{ mx: 2, mt: 2, display: "flex", alignItems: "center" }}
+        sx={{ mx: 2, mt: 2, p: 2, display: "flex", alignItems: "center" }}
       >
         <Button
           variant="contained"
           size="small"
           sx={{
-            backgroundColor: status === "In Progress" ? "red" : "#333",
+            backgroundColor: isElectionStarted ? "red" : "#333",
             "&:hover": {
-              backgroundColor: status === "In Progress" ? "red" : "#333",
+              backgroundColor: isElectionStarted ? "red" : "#333",
             },
           }}
           onClick={startEndElection}
         >
           {isElectionStarting
             ? "Loading..."
-            : status === "In Progress"
+            : isElectionStarted
             ? "End Election"
             : "Start Election"}
         </Button>
@@ -134,7 +134,7 @@ const ElectionCommissionDashboard: React.FC<
             {winner}
           </Typography>
         </Box>
-      </Paper>
+      </Card>
       <Box
         sx={{
           pt: 5,
@@ -144,18 +144,49 @@ const ElectionCommissionDashboard: React.FC<
           rowGap: 3,
         }}
       >
-        <Card sx={{ display: "flex", justifyContent: "space-around" }}>
+        <Card
+          sx={{
+            display: "flex",
+            justifyContent: "space-around",
+            py: 3,
+          }}
+        >
           <Box
             sx={{
-              flexGrow: 1,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              flexGrow: 2,
             }}
           >
-            <Typography variant="h6" sx={{ py: 2 }}>
+            <Typography variant="h6" sx={{ py: 2, fontWeight: "bold" }}>
               Party Results
             </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                ml: 4,
+              }}
+            >
+              {parties?.map((party) => (
+                <>
+                  <Box
+                    sx={{
+                      backgroundColor:
+                        party === "Independent Party"
+                          ? "green"
+                          : party.split(" ")[0].toLowerCase(),
+                      width: 20,
+                      height: 20,
+                      mr: 1,
+                    }}
+                  />
+                  <Typography sx={{ mx: 1 }}>{party}</Typography>
+                </>
+              ))}
+            </Box>
             <PieChart
               series={[
                 {
@@ -164,8 +195,8 @@ const ElectionCommissionDashboard: React.FC<
                     highlighted: "item",
                   },
                   faded: {
-                    innerRadius: 30,
-                    additionalRadius: -20,
+                    innerRadius: 20,
+                    additionalRadius: -30,
                     color: "gray",
                   },
                   data: overAllPartyResults || [],
@@ -177,13 +208,12 @@ const ElectionCommissionDashboard: React.FC<
           </Box>
           <Box
             sx={{
-              flexGrow: 1,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
             }}
           >
-            <Typography variant="h6" sx={{ py: 2 }}>
+            <Typography variant="h6" sx={{ py: 2, fontWeight: "bold" }}>
               Constituencies Results
             </Typography>
             <BarChart
@@ -216,14 +246,14 @@ const ElectionCommissionDashboard: React.FC<
                   label: "Independent",
                 },
               ]}
-              width={900}
+              width={850}
               height={300}
             />
           </Box>
         </Card>
         <Box sx={{ pb: 5 }}>
-          <Typography variant="h6" sx={{ pb: 1 }}>
-            Detailed Stats
+          <Typography variant="h6" sx={{ my: 2, ml: 2, fontWeight: "bold" }}>
+            Vote count for each candidate
           </Typography>
           <TableVote tableData={tableData} />
         </Box>

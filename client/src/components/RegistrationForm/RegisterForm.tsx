@@ -15,7 +15,6 @@ import React, { useEffect, useState } from "react";
 import QrReader from "react-qr-reader";
 import { useNavigate } from "react-router-dom";
 import { useRegisterUser } from "../../utills/datahandling";
-import "./RegisterForm.css";
 import SnackBar from "../SnackBar/SnackBar";
 import bcrypt from "bcryptjs";
 
@@ -218,7 +217,7 @@ const VoterRegistration = (props: RegisterFormProps) => {
   };
   return (
     <Box sx={{ display: "flex", justifyContent: "center" }}>
-      <Card sx={{ maxWidth: "45%", height: "60%", p: 3 }}>
+      <Card sx={{ maxWidth: "45%", p: 3 }}>
         <Typography variant="h4" sx={{ textAlign: "center" }}>
           Voter Registration
         </Typography>

@@ -306,7 +306,6 @@ app.get("/gevs/electoral/results", async (req, res) => {
 // add candidate vote
 app.post("/gevs/consitiuency/candidate/vote", async (req, res) => {
     const { constituency, candidateName, email } = req.body;
-    console.log(req.body)
     try {
         const userRef = db.collection("users").doc(email);
         const userDoc = await userRef.get();

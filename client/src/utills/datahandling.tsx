@@ -6,6 +6,7 @@ import {
   CandidateList,
 } from "../views/VoterDashBoard/VoterDashboard";
 import { RegisterUserData } from "../components/RegistrationForm/RegisterForm";
+import { LoginDetails } from "../components/LoginForm/LoginForm";
 
 const axiosClient = axios.create({
   baseURL: "http://localhost:5000",
@@ -52,22 +53,9 @@ const registerUser = async (data: RegisterUserData) => {
   }
 };
 
-const loginUser = async (data: any) => {
+const loginUser = async (data: LoginDetails) => {
   try {
     const response = await axiosClient.post("/gevs/user/login", data);
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      return error.response?.data;
-    } else {
-      return error;
-    }
-  }
-};
-
-const updateUser = async (data: any) => {
-  try {
-    const response = await axiosClient.put(`/gevs/users/register`, data);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -182,20 +170,13 @@ export const useLoginUser = () => {
     mutate: login,
     error,
     isSuccess,
+    isPending,
     data,
   } = useMutation({
     mutationKey: ["loginUser"],
-    mutationFn: (data: any) => loginUser(data),
+    mutationFn: (data: LoginDetails) => loginUser(data),
   });
-  return { login, error, isSuccess, data };
-};
-
-export const useUpdateUser = () => {
-  const { mutate: updateUserMutation } = useMutation({
-    mutationKey: ["updateUser"],
-    mutationFn: updateUser,
-  });
-  return { updateUserMutation };
+  return { login, error, isSuccess, data, isLoginPending: isPending };
 };
 
 export const useGetCandidateList = (
@@ -231,14 +212,16 @@ export const useGetOverAllPartyElectionResults = () => {
     queryFn: getOverAllPartyElectionResults,
     refetchInterval: 5000,
   });
+  const parties: string[] = [];
   const overAllPartyResults =
     data &&
     data.seats.length > 0 &&
     data.seats.map((data: { party: string; seats: number }, index: number) => {
+      if (!parties.includes(data.party)) parties.push(data.party);
       return {
         id: `${index} + ${Math.random()}`,
         value: data.seats,
-        label: data.party,
+        // label: data.party,
         color:
           data.party === "Independent Party"
             ? "green"
@@ -254,6 +237,7 @@ export const useGetOverAllPartyElectionResults = () => {
     isAllResultsLoading: isLoading,
     winner,
     status,
+    parties,
   };
 };
 

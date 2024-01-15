@@ -9,7 +9,6 @@ import {
   Typography,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import "./VoterDashboard.css";
 import {
   useGetCandidateList,
   useGetElectionStartStatus,
@@ -18,6 +17,11 @@ import {
 import { AuthContext } from "../../Providers/AuthProvider";
 import candidateImage from "../../assets/voterImage.png";
 import SnackBar from "../../components/SnackBar/SnackBar";
+import EmailIcon from "@mui/icons-material/Email";
+import CakeIcon from "@mui/icons-material/Cake";
+import LocationCityIcon from "@mui/icons-material/LocationCity";
+import Clock from "../../components/Clock/Clock";
+
 export type Candidate = {
   name: string;
   party: string;
@@ -34,7 +38,7 @@ export type CandidateList = {
 };
 
 const VoterDashboard = () => {
-  const { userData, logoutSuccess, updateElectionStatus } =
+  const { userData, logoutSuccess, updateElectionStatus, onVoteSuccess } =
     useContext(AuthContext);
   const { submitVote, submitVoteResponse } = useSubmitVote();
   const { candidateList } = useGetCandidateList(userData.constituency || "");
@@ -47,15 +51,15 @@ const VoterDashboard = () => {
   const { candidates = [], parties = [] } = candidateList || {};
   const [selectedParty, setSelectedParty] = useState<string>("");
   const [selectedCandidate, setSelectedCandidate] = useState<string>("");
-  console.log("userData.electionStatus: ", userData.electionStatus);
   const handleViewCandidatesClick = (partyName: string) => {
     setSelectedParty(partyName);
     setSelectedCandidate("");
   };
 
   useEffect(() => {
-    updateElectionStatus!(electionStatus.status);
-  }, [electionStatus, updateElectionStatus]);
+    if (userData.isAuthenticated && electionStatus && electionStatus.status)
+      updateElectionStatus!(electionStatus.status);
+  }, [electionStatus, userData.isAuthenticated]);
 
   const handleClose = (
     event?: React.SyntheticEvent | Event,
@@ -79,6 +83,7 @@ const VoterDashboard = () => {
         severity: "success",
       }));
       setSnackBarOpen((prev) => !prev);
+      onVoteSuccess();
     }
   }, [submitVoteResponse]);
 
@@ -92,7 +97,13 @@ const VoterDashboard = () => {
   };
 
   return (
-    <Box>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: 1,
+      }}
+    >
       <Box
         sx={{
           backgroundColor: "#333",
@@ -121,18 +132,19 @@ const VoterDashboard = () => {
         sx={{
           display: "flex",
           justifyContent: "space-around",
-          mt: 3,
+          alignItems: "center",
           mx: 2,
           gap: 1,
+          mt: 2,
         }}
       >
-        <Card sx={{ flexGrow: 1 }}>
+        <Card sx={{ flexGrow: 1, height: 1, mt: 5 }}>
           <Box
             sx={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              p: 3,
+              py: 4,
             }}
           >
             <Avatar
@@ -140,22 +152,42 @@ const VoterDashboard = () => {
               src={candidateImage}
               sx={{ width: 160, height: 160 }}
             />
-            <Typography variant="h6" sx={{ textAlign: "left" }}>
-              {`Full Name : ${userData.fullName}`}
+            <Typography variant="h6" sx={{ textAlign: "center", my: 1 }}>
+              {userData.fullName}
             </Typography>
-            <Typography variant="h6" sx={{}}>
-              {`Constituency : ${userData.constituency}`}
-            </Typography>
-            <Typography variant="h6" sx={{ textAlign: "center" }}>
-              {` ${userData.email}`}
-            </Typography>
-            <Typography variant="h6" sx={{ textAlign: "center" }}>
-              {` ${userData.dateOfBirth}`}
-            </Typography>
+            <Box sx={{ display: "flex" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  rowGap: 1,
+                }}
+              >
+                <EmailIcon sx={{ mr: 1 }} />
+                <LocationCityIcon sx={{ mr: 1 }} />
+                <CakeIcon sx={{ mr: 0 }} />
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <Typography variant="h6" sx={{ textAlign: "left" }}>
+                  {userData.email}
+                </Typography>
+                <Typography variant="h6" sx={{ textAlign: "left" }}>
+                  {userData.constituency}
+                </Typography>
+                <Typography variant="h6" sx={{ textAlign: "left" }}>
+                  {userData.dateOfBirth}
+                </Typography>
+              </Box>
+            </Box>
           </Box>
         </Card>
-        {!userData.isVoted && userData.electionStatus === "started" ? (
-          <Card sx={{ flexGrow: 2 }}>
+        <Card sx={{ flexGrow: 1, height: 1, mt: 5 }}>
+          {!userData.isVoted && userData.electionStatus === "started" ? (
             <Box sx={{ p: 3 }}>
               <Typography variant="h5" sx={{ textAlign: "center" }}>
                 Cast Your Vote
@@ -208,10 +240,25 @@ const VoterDashboard = () => {
                 </Button>
               </form>
             </Box>
-          </Card>
-        ) : (
-          <Box>Election is not started yet</Box>
-        )}
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column",
+                alignItems: "center",
+                height: 1,
+              }}
+            >
+              <Clock />
+              <Typography variant="h4" sx={{ textAlign: "center" }}>
+                {userData.isVoted
+                  ? "You have already voted"
+                  : "Election is not started"}
+              </Typography>
+            </Box>
+          )}
+        </Card>
       </Box>
       <SnackBar
         isSnackbarOpen={isSnackbarOpen}
