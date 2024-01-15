@@ -150,6 +150,19 @@ const startEndElection = async (startElection: boolean) => {
   }
 };
 
+const getElectionStartStatus = async () => {
+  try {
+    const response = await axiosClient.get("/gevs/election/status");
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data;
+    } else {
+      return error;
+    }
+  }
+};
+
 // tanstack/react-query
 export const useRegisterUser = () => {
   const {
@@ -188,7 +201,7 @@ export const useUpdateUser = () => {
 export const useGetCandidateList = (
   constituency: string
 ): {
-  data: CandidateList;
+  candidateList: CandidateList;
   refetch: () => void;
   isLoading: boolean;
 } => {
@@ -209,7 +222,7 @@ export const useGetCandidateList = (
       };
     });
   parties = [...new Set(parties)];
-  return { data: { candidates, parties }, refetch, isLoading };
+  return { candidateList: { candidates, parties }, refetch, isLoading };
 };
 
 export const useGetOverAllPartyElectionResults = () => {
@@ -312,4 +325,13 @@ export const useStartEndElection = () => {
     electionToggleData: data,
     isElectionStarting: isPending,
   };
+};
+
+export const useGetElectionStartStatus = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ["getElectionStartStatus"],
+    queryFn: getElectionStartStatus,
+    refetchInterval: 5000,
+  });
+  return { electionStatus: data, isLoading };
 };

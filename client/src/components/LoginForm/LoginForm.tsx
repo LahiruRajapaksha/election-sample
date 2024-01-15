@@ -32,6 +32,7 @@ const Login = () => {
         fullName: decodedToken.fullName,
         isVoted: decodedToken.isVoted,
         isAuthenticated: true,
+        electionStatus: decodedToken.electionStatus,
       });
       if (decodedToken.userType === "officer")
         navigate("/officer-dashboard", { replace: true });

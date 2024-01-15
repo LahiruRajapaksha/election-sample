@@ -91,16 +91,16 @@ const ElectionCommissionDashboard: React.FC<
           variant="contained"
           size="small"
           sx={{
-            backgroundColor: electionStarted ? "red" : "#333",
+            backgroundColor: status === "In Progress" ? "red" : "#333",
             "&:hover": {
-              backgroundColor: electionStarted ? "red" : "#333",
+              backgroundColor: status === "In Progress" ? "red" : "#333",
             },
           }}
           onClick={startEndElection}
         >
           {isElectionStarting
             ? "Loading..."
-            : electionStarted
+            : status === "In Progress"
             ? "End Election"
             : "Start Election"}
         </Button>

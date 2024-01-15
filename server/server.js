@@ -23,9 +23,8 @@ const db = admin.firestore();
 
 // add user data
 app.post("/gevs/users/register", async (req, res) => {
-    const { email } = req.body;
+    const { email, password } = req.body;
     try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
         const userRef = db.collection("users").doc(email);
         const uvcRef = db.collection("uvc").doc(req.body.uvc);
 
@@ -48,7 +47,7 @@ app.post("/gevs/users/register", async (req, res) => {
             ...req.body,
             isVoted: false,
             userType: "voter",
-            password: hashedPassword,
+            password: password,
         });
         const uvcResults = await db.collection("uvc").doc(req.body.uvc).update({ isUsed: true });
         res.status(201).send("User registered successfully");
@@ -61,10 +60,14 @@ app.post("/gevs/users/register", async (req, res) => {
 // get user data
 app.post("/gevs/user/login", async (req, res) => {
     const { email, password } = req.body;
-    console.log(email, password, req.body)
     try{
         const userRef = db.collection("users").doc(email);
         const doc = await userRef.get();
+
+        const electionStatusRef = await db.collection("election").doc("electionStatus");
+        const electionSnapshot = await electionStatusRef.get();
+        const electionStatus = electionSnapshot.data();
+
         if (!doc.exists) {
             res.status(404).send("User not found");
             return;
@@ -83,6 +86,7 @@ app.post("/gevs/user/login", async (req, res) => {
                 responseData["constituency"] = results.constituency;
                 responseData["fullName"] = results.fullName;
                 responseData["dateOfBirth"] = results.dateOfBirth;
+                responseData["electionStatus"] = electionStatus["status"];
             }
             const accessToken = jwt.sign(responseData, process.env.ACCESS_TOKEN_SECRET);
             res.status(200).send({ accessToken: accessToken });
@@ -250,6 +254,7 @@ app.get("/gevs/results", async (req, res) => {
     }
 });
 
+// get all electrol district's votes
 app.get("/gevs/electoral/results", async (req, res) => {
     try {
         const electionStatusRef = await db.collection("election").doc("electionStatus");
@@ -298,6 +303,7 @@ app.get("/gevs/electoral/results", async (req, res) => {
     }
 });
 
+// add candidate vote
 app.post("/gevs/consitiuency/candidate/vote", async (req, res) => {
     const { constituency, candidateName, email } = req.body;
     console.log(req.body)
@@ -344,6 +350,18 @@ app.post("/gevs/election/start", async (req, res) => {
             res.status(200).send("Election ended successfully");
             return
         }
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+});
+
+// get election status
+app.get("/gevs/election/status", async (req, res) => {
+    try {
+        const electionStatusRef = await db.collection("election").doc("electionStatus");
+        const electionSnapshot = await electionStatusRef.get();
+        const electionStatus = electionSnapshot.data();
+        res.status(200).send(electionStatus);
     } catch (error) {
         res.status(400).send(error.message);
     }

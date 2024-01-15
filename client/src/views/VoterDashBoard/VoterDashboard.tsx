@@ -10,7 +10,11 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import "./VoterDashboard.css";
-import { useGetCandidateList, useSubmitVote } from "../../utills/datahandling";
+import {
+  useGetCandidateList,
+  useGetElectionStartStatus,
+  useSubmitVote,
+} from "../../utills/datahandling";
 import { AuthContext } from "../../Providers/AuthProvider";
 import candidateImage from "../../assets/voterImage.png";
 import SnackBar from "../../components/SnackBar/SnackBar";
@@ -30,22 +34,28 @@ export type CandidateList = {
 };
 
 const VoterDashboard = () => {
-  const { userData, logoutSuccess } = useContext(AuthContext);
+  const { userData, logoutSuccess, updateElectionStatus } =
+    useContext(AuthContext);
   const { submitVote, submitVoteResponse } = useSubmitVote();
-  const { data } = useGetCandidateList(userData.constituency || "");
+  const { candidateList } = useGetCandidateList(userData.constituency || "");
+  const { electionStatus } = useGetElectionStartStatus();
   const [isSnackbarOpen, setSnackBarOpen] = useState(false);
   const [snackBarData, setSnackBarData] = useState({
     message: "",
     severity: "",
   });
-  const { candidates = [], parties = [] } = data || {};
+  const { candidates = [], parties = [] } = candidateList || {};
   const [selectedParty, setSelectedParty] = useState<string>("");
   const [selectedCandidate, setSelectedCandidate] = useState<string>("");
-
+  console.log("userData.electionStatus: ", userData.electionStatus);
   const handleViewCandidatesClick = (partyName: string) => {
     setSelectedParty(partyName);
     setSelectedCandidate("");
   };
+
+  useEffect(() => {
+    updateElectionStatus!(electionStatus.status);
+  }, [electionStatus, updateElectionStatus]);
 
   const handleClose = (
     event?: React.SyntheticEvent | Event,
@@ -77,7 +87,7 @@ const VoterDashboard = () => {
     submitVote({
       email: userData.email,
       candidateName: selectedCandidate,
-      constituency: userData.constituency,
+      constituency: userData.constituency!,
     });
   };
 
@@ -144,7 +154,7 @@ const VoterDashboard = () => {
             </Typography>
           </Box>
         </Card>
-        {!userData.isVoted && (
+        {!userData.isVoted && userData.electionStatus === "started" ? (
           <Card sx={{ flexGrow: 2 }}>
             <Box sx={{ p: 3 }}>
               <Typography variant="h5" sx={{ textAlign: "center" }}>
@@ -199,6 +209,8 @@ const VoterDashboard = () => {
               </form>
             </Box>
           </Card>
+        ) : (
+          <Box>Election is not started yet</Box>
         )}
       </Box>
       <SnackBar

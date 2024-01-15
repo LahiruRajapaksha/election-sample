@@ -12,6 +12,7 @@ export type UserData = {
   fullName?: string;
   isVoted?: boolean;
   isAuthenticated?: boolean;
+  electionStatus?: string;
 };
 
 type initialUserData = {
@@ -19,6 +20,7 @@ type initialUserData = {
   loginSuccess: (userDetails: UserData) => void;
   logoutSuccess: () => void;
   onVoteSuccess: () => void;
+  updateElectionStatus?: (status: string) => void;
 };
 
 const initialUserData: initialUserData = {
@@ -30,10 +32,12 @@ const initialUserData: initialUserData = {
     fullName: "",
     isVoted: false,
     isAuthenticated: false,
+    electionStatus: "",
   },
   loginSuccess: () => {},
   logoutSuccess: () => {},
   onVoteSuccess: () => {},
+  updateElectionStatus: () => {},
 };
 export const AuthContext = createContext(initialUserData);
 
@@ -59,6 +63,14 @@ const AuthProvider = (props: AuthProviderProps) => {
     localStorage.removeItem("userDetails");
   };
 
+  const updateElectionStatus = (status: string) => {
+    setUserDetails((userDetails) => ({
+      ...userDetails,
+      electionStatus: status,
+    }));
+    localStorage.setItem("userDetails", JSON.stringify(userDetails));
+  };
+
   const onVoteSuccess = () => {
     setUserDetails((userDetails) => ({
       ...userDetails,
@@ -74,6 +86,7 @@ const AuthProvider = (props: AuthProviderProps) => {
         loginSuccess,
         logoutSuccess,
         onVoteSuccess,
+        updateElectionStatus,
       }}
     >
       {props.children}

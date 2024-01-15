@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { useRegisterUser } from "../../utills/datahandling";
 import "./RegisterForm.css";
 import SnackBar from "../SnackBar/SnackBar";
+import bcrypt from "bcryptjs";
 
 export type RegisterUserData = {
   email: string;
@@ -127,6 +128,10 @@ const VoterRegistration = (props: RegisterFormProps) => {
     setShowScanner(!showScanner);
   };
 
+  const encryptPassword = async (password: string) => {
+    return await bcrypt.hash(password, 10);
+  };
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setVoterDetails({ ...voterDetails, [name]: value });
@@ -193,11 +198,15 @@ const VoterRegistration = (props: RegisterFormProps) => {
     });
   };
 
-  const handleSubmit = (event: React.SyntheticEvent) => {
+  const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
     const hasFieldErrors = validateAllFields();
     if (!hasFieldErrors) {
-      register(voterDetails);
+      const voterDetailsWithEncryptedPassword = {
+        ...voterDetails,
+        password: await encryptPassword(voterDetails.password),
+      };
+      register(voterDetailsWithEncryptedPassword);
     } else {
       setSnackBarData((data) => ({
         ...data,
